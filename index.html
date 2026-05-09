@@ -352,7 +352,7 @@ textarea.finput { resize: vertical; min-height: 76px; }
 // ══ STATE ══
 const reports = [];
 let selectedRating = 0;
-let currentTheme = 'dark';
+let currentTheme = 'system';
 let tileLayer = null;
 
 const COLORS = {1:'#dc2626',2:'#ea580c',3:'#ca8a04',4:'#16a34a',5:'#06b6d4'};
@@ -506,27 +506,8 @@ function resetForm() {
 }
 
 // ══ INIT ══
-setTheme('dark');
-
-(async () => {
-  const demos = [
-    {name:'台北市立南港運動中心',address:'台北市南港區玉成街160號', payType:'時薪制',salary:'時薪 190 元',chores:['加藥','機房操作'],alone:'是，常需獨自承擔風險',rating:2,comment:'假日常常一個人顧，壓力很大，薪水也沒有比較多。'},
-    {name:'台北市立中山運動中心',address:'台北市中山區樂群二路',     payType:'月薪制',salary:'月薪 38,000 元',chores:['無'],alone:'否，人力符合規定',rating:5,comment:'管理制度完善，人員配置合理，推薦！'},
-    {name:'新店碧潭游泳池',       address:'新北市新店區碧潭路',       payType:'時薪制',salary:'時薪 176 元',chores:['清潔場地','清潔廁所'],alone:'是，常需獨自承擔風險',rating:1,comment:'薪資低，還要打掃廁所，管理混亂，強烈不推。'},
-    {name:'板橋區立游泳池',       address:'新北市板橋區文化路二段',   payType:'時薪制',salary:'時薪 185 元',chores:['清潔場地'],alone:'否，人力符合規定',rating:4,comment:'環境不錯，主管比較好說話，值得推薦。'},
-  ];
-  for (const d of demos) {
-    const coords = await geocode(d.address);
-    if (coords) {
-      const r={...d,lat:coords.lat,lon:coords.lon};
-      reports.push(r);
-      const m=L.marker([r.lat,r.lon],{icon:createIcon(r.rating)}).addTo(map);
-      m.bindPopup(buildPopup(r),{maxWidth:280});
-    }
-    await new Promise(ok=>setTimeout(ok,700));
-  }
-  updateStats();
-})();
+setTheme('system');
+updateStats();
 </script>
 </body>
 </html>
