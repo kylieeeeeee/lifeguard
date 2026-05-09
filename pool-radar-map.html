@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>救生員避雷地圖 Lifeguard Radar</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ══ DARK THEME ══ */
+:root, [data-theme="dark"] {
+  --bg:          #060d18;
+  --surface:     #0c1929;
+  --surface2:    #101f33;
+  --surface3:    #152540;
+  --accent:      #06b6d4;
+  --accent2:     #0891b2;
+  --accent-glow: rgba(6,182,212,0.25);
+  --text:        #dde7f0;
+  --text-muted:  #4d6a85;
+  --border:      #1a3050;
+  --topbar-grad: rgba(6,13,24,0.94);
+  --shadow:      rgba(0,0,0,0.55);
+  --overlay-bg:  rgba(6,13,24,0.68);
+}
+
+/* ══ LIGHT THEME ══ */
+[data-theme="light"] {
+  --bg:          #eef2f7;
+  --surface:     #ffffff;
+  --surface2:    #f3f7fb;
+  --surface3:    #e6eef7;
+  --accent:      #0891b2;
+  --accent2:     #0e7490;
+  --accent-glow: rgba(8,145,178,0.18);
+  --text:        #1a2e42;
+  --text-muted:  #6b8aab;
+  --border:      #c8d9eb;
+  --topbar-grad: rgba(238,242,247,0.94);
+  --shadow:      rgba(0,30,70,0.12);
+  --overlay-bg:  rgba(90,120,160,0.35);
+}
+
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'Noto Sans TC','PingFang TC',sans-serif; background: var(--bg); color: var(--text); }
+#map { width: 100%; height: 100vh; }
+
+/* ── TOP BAR ── */
+.topbar {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 1000;
+  background: linear-gradient(180deg, var(--topbar-grad) 0%, transparent 100%);
+  padding: 18px 20px 50px;
+  display: flex; align-items: flex-start; justify-content: space-between;
+  pointer-events: none;
+}
+.logo { pointer-events: all; display: flex; align-items: center; gap: 12px; }
+.logo-mark {
+  width: 42px; height: 42px; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  font-size: 21px; box-shadow: 0 0 18px var(--accent-glow);
+}
+.logo-text { font-size: 18px; font-weight: 900; color: var(--text); letter-spacing: -0.02em; }
+.logo-sub  { font-size: 10px; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
+.topbar-right { pointer-events: all; display: flex; gap: 8px; align-items: flex-start; }
+
+/* ── THEME TOGGLE ── */
+.theme-toggle {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 4px; display: flex; gap: 2px;
+  backdrop-filter: blur(12px); box-shadow: 0 4px 16px var(--shadow);
+}
+.tbtn {
+  width: 32px; height: 32px; border-radius: 7px; border: none; background: transparent;
+  cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted); transition: all 0.15s;
+}
+.tbtn.active { background: var(--accent); color: #fff; box-shadow: 0 2px 8px var(--accent-glow); }
+.tbtn:not(.active):hover { background: var(--surface2); color: var(--text); }
+
+/* ── STATS ── */
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 7px 14px; text-align: center;
+  backdrop-filter: blur(12px); box-shadow: 0 4px 16px var(--shadow);
+}
+.stat-num   { font-size: 20px; font-weight: 900; color: var(--accent); line-height: 1; }
+.stat-label { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+
+/* ── LEGEND ── */
+.legend {
+  position: absolute; bottom: 28px; left: 16px; z-index: 1000;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 13px 16px;
+  backdrop-filter: blur(12px); box-shadow: 0 4px 20px var(--shadow);
+}
+.legend-title { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 9px; }
+.legend-item  { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text); margin-bottom: 5px; }
+.legend-item:last-child { margin-bottom: 0; }
+.ldot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── FAB ── */
+.fab {
+  position: absolute; bottom: 28px; right: 16px; z-index: 1000;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff; border: none; border-radius: 50px;
+  padding: 13px 24px; font-family: inherit; font-size: 15px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; gap: 8px;
+  box-shadow: 0 0 22px var(--accent-glow), 0 6px 20px var(--shadow);
+  transition: all 0.2s;
+}
+.fab:hover { transform: translateY(-3px); box-shadow: 0 0 38px rgba(6,182,212,0.45), 0 10px 28px var(--shadow); }
+
+/* ── MODAL ── */
+.overlay {
+  position: fixed; inset: 0; background: var(--overlay-bg);
+  backdrop-filter: blur(10px); z-index: 2000;
+  display: none; align-items: center; justify-content: center; padding: 16px;
+}
+.overlay.open { display: flex; }
+.modal {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 18px; width: 100%; max-width: 500px;
+  max-height: 92vh; overflow-y: auto; padding: 24px 26px;
+  box-shadow: 0 30px 70px var(--shadow); animation: slideUp 0.25s ease;
+}
+@keyframes slideUp { from { opacity:0;transform:translateY(18px); } to { opacity:1;transform:translateY(0); } }
+.modal::-webkit-scrollbar { width: 5px; }
+.modal::-webkit-scrollbar-track { background: var(--surface2); }
+.modal::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.modal-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
+.modal-title    { font-size: 17px; font-weight: 900; color: var(--text); }
+.modal-subtitle { font-size: 11px; color: var(--accent); margin-top: 3px; letter-spacing: 0.05em; }
+.close {
+  width: 30px; height: 30px; flex-shrink: 0;
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text-muted); cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+}
+.close:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── FORM ── */
+.fg { margin-bottom: 16px; }
+.flabel { display: block; font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.req { color: var(--accent); margin-left: 2px; }
+.finput {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 9px; padding: 10px 13px; color: var(--text);
+  font-family: inherit; font-size: 14px; outline: none; transition: border-color 0.15s;
+}
+.finput:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.finput::placeholder { color: var(--text-muted); }
+textarea.finput { resize: vertical; min-height: 76px; }
+.geocode-hint { font-size: 11px; color: var(--accent); margin-top: 5px; display: none; }
+
+.choice-group { display: flex; flex-direction: column; gap: 6px; }
+.choice {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 9px; padding: 9px 13px; cursor: pointer;
+  font-size: 13px; color: var(--text); transition: all 0.15s; user-select: none;
+}
+.choice:hover { border-color: var(--accent); background: var(--surface3); }
+.choice input { accent-color: var(--accent); width: 14px; height: 14px; flex-shrink: 0; }
+
+/* ── RATING ── */
+.rating-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-bottom: 6px; }
+.rating-row { display: flex; gap: 6px; }
+.rbtn {
+  flex: 1; height: 42px; border-radius: 9px; border: 2px solid var(--border);
+  background: var(--surface2); color: var(--text-muted); font-size: 14px; font-weight: 900;
+  cursor: pointer; transition: all 0.15s; font-family: inherit;
+}
+.rbtn:hover { border-color: var(--accent); color: var(--text); }
+.rbtn[data-v="1"].active{background:#dc2626;border-color:#dc2626;color:#fff;}
+.rbtn[data-v="2"].active{background:#ea580c;border-color:#ea580c;color:#fff;}
+.rbtn[data-v="3"].active{background:#ca8a04;border-color:#ca8a04;color:#fff;}
+.rbtn[data-v="4"].active{background:#16a34a;border-color:#16a34a;color:#fff;}
+.rbtn[data-v="5"].active{background:#06b6d4;border-color:#06b6d4;color:#fff;}
+
+.fdivider { height: 1px; background: var(--border); margin: 4px 0 16px; }
+
+.submit {
+  width: 100%; margin-top: 6px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff; border: none; border-radius: 10px; padding: 13px;
+  font-family: inherit; font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+}
+.submit:hover { transform: translateY(-1px); box-shadow: 0 4px 18px var(--accent-glow); }
+.submit:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 74px; right: 16px; z-index: 4000;
+  background: #065f46; border: 1px solid #059669; color: #d1fae5;
+  padding: 12px 18px; border-radius: 11px; font-size: 13px; font-weight: 600;
+  transform: translateY(80px); opacity: 0; transition: all 0.3s; pointer-events: none;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* ── POPUP ── */
+.leaflet-popup-content-wrapper {
+  background: var(--surface) !important; border: 1px solid var(--border) !important;
+  border-radius: 12px !important; box-shadow: 0 12px 40px var(--shadow) !important;
+  color: var(--text) !important; padding: 0 !important;
+}
+.leaflet-popup-tip-container { display: none !important; }
+.leaflet-popup-content { margin: 0 !important; }
+.popup { padding: 15px 17px; min-width: 210px; }
+.popup-name   { font-size: 15px; font-weight: 900; color: var(--text); margin-bottom: 3px; }
+.popup-addr   { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
+.popup-rating { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 9px; }
+.popup-row    { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+.popup-row span { color: var(--text); }
+.popup-comment { font-size: 12px; color: var(--text-muted); margin-top: 9px; padding-top: 9px; border-top: 1px solid var(--border); line-height: 1.6; }
+
+/* Attribution styling per theme */
+[data-theme="light"] .leaflet-control-attribution { background: rgba(255,255,255,0.85) !important; color: #4a6a88 !important; }
+[data-theme="dark"]  .leaflet-control-attribution { background: rgba(8,16,30,0.7)   !important; color: #4d6a85    !important; }
+</style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<!-- Top bar -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-mark">🏊</div>
+    <div>
+      <div class="logo-text">救生員避雷地圖</div>
+      <div class="logo-sub">Lifeguard Radar · 場館工作回報</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="theme-toggle">
+      <button class="tbtn" id="btn-light"  onclick="setTheme('light')"  title="亮色模式">☀️</button>
+      <button class="tbtn active" id="btn-dark" onclick="setTheme('dark')"   title="暗色模式">🌙</button>
+      <button class="tbtn" id="btn-system" onclick="setTheme('system')" title="跟隨系統">⚙️</button>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-total">0</div>
+      <div class="stat-label">總回報</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-avg">—</div>
+      <div class="stat-label">平均分</div>
+    </div>
+  </div>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-title">避雷評分</div>
+  <div class="legend-item"><div class="ldot" style="background:#dc2626"></div>1 超雷</div>
+  <div class="legend-item"><div class="ldot" style="background:#ea580c"></div>2 偏雷</div>
+  <div class="legend-item"><div class="ldot" style="background:#ca8a04"></div>3 普通</div>
+  <div class="legend-item"><div class="ldot" style="background:#16a34a"></div>4 不錯</div>
+  <div class="legend-item"><div class="ldot" style="background:#06b6d4"></div>5 超推</div>
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="openModal()">⚠️ 立即回報</button>
+
+<!-- Modal -->
+<div class="overlay" id="overlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modal">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">場館工作內容回報</div>
+        <div class="modal-subtitle">救生員游泳場館 · 匿名回報</div>
+      </div>
+      <button class="close" onclick="closeModal()">✕</button>
+    </div>
+
+    <div class="fg">
+      <label class="flabel">場館名稱<span class="req">*</span></label>
+      <input id="f-name" class="finput" type="text" placeholder="例：XX 游泳池、OO 運動中心">
+    </div>
+    <div class="fg">
+      <label class="flabel">場館地址<span class="req">*</span></label>
+      <input id="f-addr" class="finput" type="text" placeholder="完整地址，用於標示地圖位置">
+      <div class="geocode-hint" id="geocode-hint">🔍 定位中...</div>
+    </div>
+
+    <div class="fdivider"></div>
+
+    <div class="fg">
+      <label class="flabel">給薪模式<span class="req">*</span></label>
+      <div class="choice-group">
+        <label class="choice"><input type="radio" name="pay-type" value="時薪制"> 時薪制</label>
+        <label class="choice"><input type="radio" name="pay-type" value="月薪制"> 月薪制</label>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="flabel">薪資水準<span class="req">*</span></label>
+      <input id="f-salary" class="finput" type="text" placeholder="例：時薪 190，或月薪 36,000">
+    </div>
+
+    <div class="fdivider"></div>
+
+    <div class="fg">
+      <label class="flabel">是否需要負擔雜事<span class="req">*</span></label>
+      <div class="choice-group">
+        <label class="choice"><input type="checkbox" name="chores" value="無"> 無</label>
+        <label class="choice"><input type="checkbox" name="chores" value="清潔場地"> 清潔場地</label>
+        <label class="choice"><input type="checkbox" name="chores" value="清潔廁所"> 清潔廁所</label>
+        <label class="choice"><input type="checkbox" name="chores" value="機房操作"> 機房操作</label>
+        <label class="choice"><input type="checkbox" name="chores" value="加藥"> 加藥</label>
+        <label class="choice"><input type="checkbox" name="chores" value="兼任櫃台"> 兼任櫃台</label>
+      </div>
+      <input id="f-chores-other" class="finput" style="margin-top:8px" type="text" placeholder="其他（選填）">
+    </div>
+    <div class="fg">
+      <label class="flabel">是否常態性獨立當班<span class="req">*</span></label>
+      <div class="choice-group">
+        <label class="choice"><input type="radio" name="alone" value="是，常需獨自承擔風險"> 是，常需獨自承擔風險</label>
+        <label class="choice"><input type="radio" name="alone" value="否，人力符合規定"> 否，人力符合規定</label>
+      </div>
+    </div>
+
+    <div class="fdivider"></div>
+
+    <div class="fg">
+      <label class="flabel">整體避雷評分<span class="req">*</span></label>
+      <div class="rating-labels"><span>⚡ 超雷</span><span></span><span>普通</span><span></span><span>🏊 超推</span></div>
+      <div class="rating-row">
+        <button class="rbtn" data-v="1" onclick="setRating(1)">1</button>
+        <button class="rbtn" data-v="2" onclick="setRating(2)">2</button>
+        <button class="rbtn" data-v="3" onclick="setRating(3)">3</button>
+        <button class="rbtn" data-v="4" onclick="setRating(4)">4</button>
+        <button class="rbtn" data-v="5" onclick="setRating(5)">5</button>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="flabel">血淚心得或推薦理由</label>
+      <textarea id="f-comment" class="finput" placeholder="分享工作體驗，幫助同業避雷！"></textarea>
+    </div>
+    <button class="submit" id="submit-btn" onclick="submitReport()">📍 送出回報並標示地圖</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ STATE ══
+const reports = [];
+let selectedRating = 0;
+let currentTheme = 'dark';
+let tileLayer = null;
+
+const COLORS = {1:'#dc2626',2:'#ea580c',3:'#ca8a04',4:'#16a34a',5:'#06b6d4'};
+const RATING_TEXT = {1:'⚡ 超雷',2:'偏雷',3:'普通',4:'不錯',5:'🏊 超推'};
+
+const TILES = {
+  dark:  'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+  light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+};
+const ATTR = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>';
+
+// ══ MAP INIT ══
+const map = L.map('map', {center:[25.047,121.517],zoom:12,zoomControl:false});
+L.control.zoom({position:'bottomright'}).addTo(map);
+
+function applyTile(isDark) {
+  if (tileLayer) map.removeLayer(tileLayer);
+  tileLayer = L.tileLayer(isDark ? TILES.dark : TILES.light, {attribution:ATTR,subdomains:'abcd',maxZoom:19}).addTo(map);
+}
+
+// ══ THEME ══
+const sysDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+function setTheme(theme) {
+  currentTheme = theme;
+  const isDark = theme === 'system' ? sysDark.matches : theme === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  applyTile(isDark);
+  ['light','dark','system'].forEach(t =>
+    document.getElementById('btn-'+t).classList.toggle('active', t === theme)
+  );
+}
+
+sysDark.addEventListener('change', () => { if (currentTheme === 'system') setTheme('system'); });
+
+// ══ MARKER ══
+function createIcon(rating) {
+  const color = COLORS[rating] || '#64748b';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="44" viewBox="0 0 36 44">
+    <filter id="g"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <path d="M18 2C9.163 2 2 9.163 2 18c0 12 16 24 16 24S34 30 34 18C34 9.163 26.837 2 18 2z"
+      fill="${color}" stroke="rgba(255,255,255,0.28)" stroke-width="1.5" filter="url(#g)"/>
+    <circle cx="18" cy="17" r="7" fill="rgba(0,0,0,0.22)"/>
+    <text x="18" y="22" text-anchor="middle" fill="white" font-size="11" font-weight="900" font-family="sans-serif">${rating}</text>
+  </svg>`;
+  return L.divIcon({html:svg,className:'',iconSize:[36,44],iconAnchor:[18,44],popupAnchor:[0,-46]});
+}
+
+// ══ POPUP ══
+function buildPopup(r) {
+  const c = COLORS[r.rating];
+  const chores = r.chores.length ? r.chores.join('、') : '無';
+  return `<div class="popup">
+    <div class="popup-name">${r.name}</div>
+    <div class="popup-addr">📍 ${r.address}</div>
+    <div class="popup-rating" style="background:${c}22;color:${c};border:1px solid ${c}44">評分 ${r.rating}・${RATING_TEXT[r.rating]}</div>
+    <div class="popup-row">💰 給薪：<span>${r.payType}　${r.salary}</span></div>
+    <div class="popup-row">🧹 雜事：<span>${chores}</span></div>
+    <div class="popup-row">👤 獨立當班：<span>${r.alone}</span></div>
+    ${r.comment ? `<div class="popup-comment">💬 ${r.comment}</div>` : ''}
+  </div>`;
+}
+
+// ══ MODAL ══
+function openModal()  { document.getElementById('overlay').classList.add('open'); }
+function closeModal() { document.getElementById('overlay').classList.remove('open'); }
+function handleOverlayClick(e) { if (e.target.id==='overlay') closeModal(); }
+
+// ══ RATING ══
+function setRating(v) {
+  selectedRating = v;
+  document.querySelectorAll('.rbtn').forEach(b => b.classList.toggle('active', +b.dataset.v === v));
+}
+
+// ══ GEOCODE (Nominatim / OpenStreetMap — 免費開源) ══
+async function geocode(address) {
+  const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1&countrycodes=tw`,{headers:{'Accept-Language':'zh-TW'}});
+  const data = await res.json();
+  return data[0] ? {lat:parseFloat(data[0].lat),lon:parseFloat(data[0].lon)} : null;
+}
+
+// ══ STATS ══
+function updateStats() {
+  document.getElementById('stat-total').textContent = reports.length;
+  if (reports.length) {
+    document.getElementById('stat-avg').textContent =
+      (reports.reduce((a,r)=>a+r.rating,0)/reports.length).toFixed(1);
+  }
+}
+
+// ══ ADD MARKER ══
+function addMarker(r) {
+  const m = L.marker([r.lat,r.lon],{icon:createIcon(r.rating)}).addTo(map);
+  m.bindPopup(buildPopup(r),{maxWidth:280});
+  m.openPopup();
+  map.setView([r.lat,r.lon],15,{animate:true,duration:0.8});
+}
+
+// ══ TOAST ══
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ══ SUBMIT ══
+async function submitReport() {
+  const name = document.getElementById('f-name').value.trim();
+  const addr = document.getElementById('f-addr').value.trim();
+  const payType = document.querySelector('input[name="pay-type"]:checked')?.value;
+  const salary  = document.getElementById('f-salary').value.trim();
+  const alone   = document.querySelector('input[name="alone"]:checked')?.value;
+  const comment = document.getElementById('f-comment').value.trim();
+  const choresOther = document.getElementById('f-chores-other').value.trim();
+  const chores  = [...document.querySelectorAll('input[name="chores"]:checked')].map(c=>c.value);
+  if (choresOther) chores.push(choresOther);
+
+  if (!name)   return alert('請填寫場館名稱');
+  if (!addr)   return alert('請填寫場館地址');
+  if (!payType)return alert('請選擇給薪模式');
+  if (!salary) return alert('請填寫薪資水準');
+  if (!chores.length) return alert('請選擇雜事負擔情形');
+  if (!alone)  return alert('請選擇是否獨立當班');
+  if (!selectedRating) return alert('請選擇整體評分');
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled=true; btn.textContent='🔍 定位中...';
+  document.getElementById('geocode-hint').style.display='block';
+
+  try {
+    const coords = await geocode(addr);
+    document.getElementById('geocode-hint').style.display='none';
+    if (!coords) { alert('無法定位此地址，請確認地址是否正確（建議加上縣市名稱）'); return; }
+    const r = {name,address:addr,payType,salary,chores,alone,rating:selectedRating,comment,lat:coords.lat,lon:coords.lon};
+    reports.push(r); addMarker(r); updateStats();
+    showToast(`✅ ${name} 已標示在地圖上！`);
+    closeModal(); resetForm();
+  } catch { alert('定位失敗，請確認網路連線並再試一次'); }
+  finally {
+    btn.disabled=false; btn.textContent='📍 送出回報並標示地圖';
+    document.getElementById('geocode-hint').style.display='none';
+  }
+}
+
+function resetForm() {
+  ['f-name','f-addr','f-salary','f-comment','f-chores-other'].forEach(id=>document.getElementById(id).value='');
+  document.querySelectorAll('input[name="pay-type"],input[name="alone"]').forEach(r=>r.checked=false);
+  document.querySelectorAll('input[name="chores"]').forEach(c=>c.checked=false);
+  document.querySelectorAll('.rbtn').forEach(b=>b.classList.remove('active'));
+  selectedRating=0;
+}
+
+// ══ INIT ══
+setTheme('dark');
+
+(async () => {
+  const demos = [
+    {name:'台北市立南港運動中心',address:'台北市南港區玉成街160號', payType:'時薪制',salary:'時薪 190 元',chores:['加藥','機房操作'],alone:'是，常需獨自承擔風險',rating:2,comment:'假日常常一個人顧，壓力很大，薪水也沒有比較多。'},
+    {name:'台北市立中山運動中心',address:'台北市中山區樂群二路',     payType:'月薪制',salary:'月薪 38,000 元',chores:['無'],alone:'否，人力符合規定',rating:5,comment:'管理制度完善，人員配置合理，推薦！'},
+    {name:'新店碧潭游泳池',       address:'新北市新店區碧潭路',       payType:'時薪制',salary:'時薪 176 元',chores:['清潔場地','清潔廁所'],alone:'是，常需獨自承擔風險',rating:1,comment:'薪資低，還要打掃廁所，管理混亂，強烈不推。'},
+    {name:'板橋區立游泳池',       address:'新北市板橋區文化路二段',   payType:'時薪制',salary:'時薪 185 元',chores:['清潔場地'],alone:'否，人力符合規定',rating:4,comment:'環境不錯，主管比較好說話，值得推薦。'},
+  ];
+  for (const d of demos) {
+    const coords = await geocode(d.address);
+    if (coords) {
+      const r={...d,lat:coords.lat,lon:coords.lon};
+      reports.push(r);
+      const m=L.marker([r.lat,r.lon],{icon:createIcon(r.rating)}).addTo(map);
+      m.bindPopup(buildPopup(r),{maxWidth:280});
+    }
+    await new Promise(ok=>setTimeout(ok,700));
+  }
+  updateStats();
+})();
+</script>
+</body>
+</html>
