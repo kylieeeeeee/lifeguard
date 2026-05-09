@@ -376,6 +376,7 @@ textarea.finput{resize:vertical;min-height:75px;}
 ════════════════════════════════════════ */
 const SUPABASE_URL  = 'https://euinsntybozxjhsddeqm.supabase.co';
 const SUPABASE_KEY  = 'sb_publishable_AbidJYNYkRcpXqj49kscCQ_VMWZlx2L';
+const GOOGLE_KEY    = 'AIzaSyCq0qDCSrGaH_RYEjc7g0Ny9UQ_12it65k';
 /* ════════════════════════════════════════ */
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -567,25 +568,72 @@ function onVF(){
 }
 async function fetchAC(q){
   try{
-    const r=await fetch(
-      // countrycodes=tw 限制只搜台灣；加上 台灣 關鍵字提升精準度
-      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=8&addressdetails=1&namedetails=1&countrycodes=tw&accept-language=zh-TW`,
-      {headers:{'Accept-Language':'zh-TW'}}
-    );
-    acResults=await r.json(); renderAC();
+    // Google Places API (New) — Autocomplete，限制台灣地區
+    const res=await fetch('https://places.googleapis.com/v1/places:autocomplete',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Goog-Api-Key':GOOGLE_KEY},
+      body:JSON.stringify({
+        input: q,
+        includedRegionCodes: ['tw'],
+        languageCode: 'zh-TW'
+      })
+    });
+    const data=await res.json();
+    acResults=data.suggestions||[];
+    renderAC();
   }catch{ document.getElementById('ac-drop').classList.remove('open'); }
 }
 function renderAC(){
   const drop=document.getElementById('ac-drop');
-  if(!acResults.length){ drop.innerHTML='<div class="ac-msg">找不到符合地點，可嘗試簡化關鍵字，或點下方「地圖選點」</div>'; return; }
-  drop.innerHTML=acResults.map((r,i)=>{
-    const name=r.namedetails?.name||r.display_name.split(',')[0];
-    // 精簡地址：取前兩段（去掉台灣/中華民國後綴）
-    const parts=r.display_name.split(',').map(s=>s.trim()).filter(s=>s&&s!=='台灣'&&s!=='Taiwan'&&s!=='中華民國');
-    const shortAddr=parts.slice(0,3).join('、');
+  if(!acResults.length){
+    drop.innerHTML='<div class="ac-msg">找不到符合地點，可嘗試簡化關鍵字，或點下方「地圖選點」</div>'; return;
+  }
+  drop.innerHTML=acResults.map((s,i)=>{
+    const p=s.placePrediction;
+    const main=p.structuredFormat?.mainText?.text||p.text.text.split(',')[0];
+    const sub=p.structuredFormat?.secondaryText?.text||'';
     return `<div class="ac-item" onclick="pickVenue(${i})">
-      <div class="ac-name">${name}</div><div class="ac-addr">${shortAddr}</div></div>`;
+      <div class="ac-name">${main}</div>
+      ${sub?`<div class="ac-addr">${sub}</div>`:''}
+    </div>`;
   }).join('');
+}
+async function pickVenue(i){
+  const p=acResults[i].placePrediction;
+  const placeId=p.placeId;
+  const main=p.structuredFormat?.mainText?.text||p.text.text.split(',')[0];
+  const sub=p.structuredFormat?.secondaryText?.text||p.text.text;
+
+  // 先鎖定顯示，再非同步查座標
+  document.getElementById('v-input').style.display='none';
+  document.getElementById('v-locked-name').textContent=main;
+  document.getElementById('v-locked-addr').textContent=sub;
+  document.getElementById('v-locked').style.display='flex';
+  document.getElementById('ac-drop').classList.remove('open');
+  document.getElementById('v-hint').textContent='🔍 正在取得座標...';
+  document.getElementById('v-hint').className='ac-hint';
+
+  try{
+    // 取得精確座標
+    const res=await fetch(
+      `https://places.googleapis.com/v1/places/${placeId}?fields=location,displayName,formattedAddress`,
+      {headers:{'X-Goog-Api-Key':GOOGLE_KEY,'X-Goog-FieldMask':'location,displayName,formattedAddress'}}
+    );
+    const d=await res.json();
+    selVenue={
+      placeId,
+      name:     d.displayName?.text||main,
+      address:  d.formattedAddress||sub,
+      lat:      d.location.latitude,
+      lon:      d.location.longitude
+    };
+    document.getElementById('v-locked-name').textContent=selVenue.name;
+    document.getElementById('v-locked-addr').textContent=selVenue.address;
+    checkDup();
+  }catch{
+    showToast('取得座標失敗，請重試','err');
+    clearVenue();
+  }
 }
 
 /* ══ MAP PICK MODE ══ */
@@ -632,17 +680,6 @@ map.on('click',async function(e){
   }
   openOv('ov-report');
 });
-function pickVenue(i){
-  const r=acResults[i];
-  const name=r.namedetails?.name||r.display_name.split(',')[0];
-  selVenue={placeId:String(r.place_id),name,address:r.display_name,lat:parseFloat(r.lat),lon:parseFloat(r.lon)};
-  document.getElementById('v-input').style.display='none';
-  document.getElementById('v-locked-name').textContent=name;
-  document.getElementById('v-locked-addr').textContent=r.display_name;
-  document.getElementById('v-locked').style.display='flex';
-  document.getElementById('ac-drop').classList.remove('open');
-  checkDup();
-}
 function clearVenue(){
   selVenue=null;
   document.getElementById('v-input').style.display='';
