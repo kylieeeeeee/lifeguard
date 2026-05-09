@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>救生員避雷地圖 Lifeguard Radar</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛟</text></svg>">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <!-- ★ Supabase SDK ★ -->
@@ -43,6 +44,10 @@ body{font-family:'Noto Sans TC','PingFang TC',sans-serif;background:var(--bg);co
 .stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 14px;text-align:center;}
 .stat-num{font-size:20px;font-weight:900;color:var(--accent);line-height:1;}
 .stat-label{font-size:10px;color:var(--text-muted);margin-top:2px;}
+.logout-btn{display:none;background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+  color:var(--text-muted);cursor:pointer;padding:7px 12px;font-size:12px;font-weight:600;
+  font-family:inherit;transition:all .15s;}
+.logout-btn:hover{border-color:#dc2626;color:#dc2626;}
 .legend{position:absolute;bottom:30px;left:18px;z-index:1000;
   background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;}
 .legend-title{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px;}
@@ -199,6 +204,7 @@ textarea.finput{resize:vertical;min-height:75px;}
       <div class="stat-num" id="stat-total">0</div>
       <div class="stat-label">總回報數</div>
     </div>
+    <button class="logout-btn" id="logout-btn" onclick="logout()">登出</button>
   </div>
 </div>
 
@@ -351,8 +357,8 @@ textarea.finput{resize:vertical;min-height:75px;}
 /* ════════════════════════════════════════
    ★ 填入你的 Supabase 資訊（只需改這兩行）★
 ════════════════════════════════════════ */
-const SUPABASE_URL  = 'https://euinsntybozxjhsddeqm.supabase.co';
-const SUPABASE_KEY  = 'sb_publishable_AbidJYNYkRcpXqj49kscCQ_VMWZlx2L';
+const SUPABASE_URL  = 'https://你的專案代號.supabase.co';
+const SUPABASE_KEY  = '你的 anon public key';
 /* ════════════════════════════════════════ */
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -508,13 +514,25 @@ sb.auth.onAuthStateChange((event, session)=>{
     const u=session.user;
     user = { id: u.id, name: u.user_metadata?.full_name || u.email };
     document.getElementById('user-label').textContent='立即回報';
+    document.getElementById('logout-btn').style.display='block';
     closeOv('ov-login');
-    if(event==='SIGNED_IN') showToast('👋 歡迎，'+user.name+'！');
+    // 只在真正完成 OAuth 登入時才顯示歡迎（不在頁面重整時重複顯示）
+    if(event==='SIGNED_IN' && !sessionStorage.getItem('welcomed')){
+      sessionStorage.setItem('welcomed','1');
+      showToast('👋 歡迎，'+user.name+'！');
+    }
   } else {
     user=null;
+    sessionStorage.removeItem('welcomed');
     document.getElementById('user-label').textContent='登入後回報';
+    document.getElementById('logout-btn').style.display='none';
   }
 });
+
+async function logout(){
+  await sb.auth.signOut();
+  showToast('已登出');
+}
 
 /* ══ VENUE AUTOCOMPLETE ══ */
 function onVI(){
