@@ -270,6 +270,11 @@ textarea.finput{resize:vertical;min-height:75px;}
         <div class="ac-drop" id="ac-drop"></div>
       </div>
       <div class="ac-hint" id="v-hint"></div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">
+        找不到場館？可直接在地圖上點選位置 →
+        <button onclick="startMapPick()" style="background:none;border:none;color:var(--accent);
+          cursor:pointer;font-size:11px;font-weight:700;padding:0;font-family:inherit;">點這裡開啟地圖選點</button>
+      </div>
     </div>
     <div class="fdivider"></div>
     <div class="fg">
@@ -319,6 +324,9 @@ textarea.finput{resize:vertical;min-height:75px;}
       <label class="flabel">血淚心得或推薦理由</label>
       <textarea id="f-comment" class="finput" placeholder="分享工作體驗，幫助同業避雷！"></textarea>
     </div>
+    <label class="choice" style="margin-bottom:14px;">
+      <input type="checkbox" id="f-anon"> 匿名提交（不顯示你的名稱）
+    </label>
     <button class="submit" id="submit-btn" onclick="openConfirm()">確認送出</button>
   </div>
 </div>
@@ -352,6 +360,15 @@ textarea.finput{resize:vertical;min-height:75px;}
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- MAP PICK HINT -->
+<div id="map-pick-hint" style="display:none;position:fixed;top:0;left:0;right:0;z-index:1500;
+  background:rgba(8,145,178,.92);color:#fff;padding:14px 20px;
+  align-items:center;justify-content:space-between;font-size:14px;font-weight:700;">
+  <span>📍 點選地圖上的場館位置</span>
+  <button onclick="cancelMapPick()" style="background:rgba(255,255,255,.2);border:none;border-radius:8px;
+    color:#fff;padding:6px 14px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;">取消</button>
+</div>
 
 <script>
 /* ════════════════════════════════════════
@@ -551,7 +568,8 @@ function onVF(){
 async function fetchAC(q){
   try{
     const r=await fetch(
-      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q+' 台灣')}&format=json&limit=6&addressdetails=1&namedetails=1`,
+      // countrycodes=tw 限制只搜台灣；加上 台灣 關鍵字提升精準度
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=8&addressdetails=1&namedetails=1&countrycodes=tw&accept-language=zh-TW`,
       {headers:{'Accept-Language':'zh-TW'}}
     );
     acResults=await r.json(); renderAC();
@@ -559,13 +577,61 @@ async function fetchAC(q){
 }
 function renderAC(){
   const drop=document.getElementById('ac-drop');
-  if(!acResults.length){ drop.innerHTML='<div class="ac-msg">找不到符合地點，請嘗試其他關鍵字</div>'; return; }
+  if(!acResults.length){ drop.innerHTML='<div class="ac-msg">找不到符合地點，可嘗試簡化關鍵字，或點下方「地圖選點」</div>'; return; }
   drop.innerHTML=acResults.map((r,i)=>{
     const name=r.namedetails?.name||r.display_name.split(',')[0];
+    // 精簡地址：取前兩段（去掉台灣/中華民國後綴）
+    const parts=r.display_name.split(',').map(s=>s.trim()).filter(s=>s&&s!=='台灣'&&s!=='Taiwan'&&s!=='中華民國');
+    const shortAddr=parts.slice(0,3).join('、');
     return `<div class="ac-item" onclick="pickVenue(${i})">
-      <div class="ac-name">${name}</div><div class="ac-addr">${r.display_name}</div></div>`;
+      <div class="ac-name">${name}</div><div class="ac-addr">${shortAddr}</div></div>`;
   }).join('');
 }
+
+/* ══ MAP PICK MODE ══ */
+let mapPickMode=false;
+function startMapPick(){
+  closeOv('ov-report');
+  mapPickMode=true;
+  showToast('請點選地圖上的場館位置');
+  map.getContainer().style.cursor='crosshair';
+  // 提示覆蓋層
+  document.getElementById('map-pick-hint').style.display='flex';
+}
+function cancelMapPick(){
+  mapPickMode=false;
+  map.getContainer().style.cursor='';
+  document.getElementById('map-pick-hint').style.display='none';
+  openOv('ov-report');
+}
+map.on('click',async function(e){
+  document.getElementById('ac-drop').classList.remove('open');
+  if(!mapPickMode) return;
+  mapPickMode=false;
+  map.getContainer().style.cursor='';
+  document.getElementById('map-pick-hint').style.display='none';
+
+  const {lat,lng}=e.latlng;
+  // 反查地址（reverse geocoding）
+  showToast('正在查詢位置資訊...');
+  try{
+    const r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&namedetails=1&accept-language=zh-TW`);
+    const d=await r.json();
+    const name=d.namedetails?.name||d.display_name.split(',')[0];
+    const parts=d.display_name.split(',').map(s=>s.trim()).filter(s=>s&&s!=='台灣'&&s!=='Taiwan');
+    const shortAddr=parts.slice(0,3).join('、');
+    selVenue={placeId:'custom_'+lat.toFixed(5)+'_'+lng.toFixed(5),name,address:shortAddr,lat,lon:lng};
+    document.getElementById('v-input').style.display='none';
+    document.getElementById('v-locked-name').textContent=name;
+    document.getElementById('v-locked-addr').textContent=shortAddr;
+    document.getElementById('v-locked').style.display='flex';
+    document.getElementById('v-hint').textContent='✅ 已標記地圖位置';
+    document.getElementById('v-hint').className='ac-hint ok';
+  }catch{
+    showToast('查詢位置失敗，請重試','err');
+  }
+  openOv('ov-report');
+});
 function pickVenue(i){
   const r=acResults[i];
   const name=r.namedetails?.name||r.display_name.split(',')[0];
@@ -643,7 +709,7 @@ function openConfirm(){
   const cc=document.getElementById('c-comment');
   if(comment){cc.textContent='💬 '+comment;cc.style.display='';}else{cc.style.display='none';}
 
-  window._p={pay,salary,chores,alone,comment};
+  window._p={pay,salary,chores,alone,comment,anon:document.getElementById('f-anon').checked};
   openOv('ov-confirm');
 }
 
@@ -656,7 +722,7 @@ async function submitReport(){
 
   const {error}=await sb.from('reports').insert({
     user_id:    user.id,
-    user_name:  user.name,
+    user_name:  p.anon ? '匿名' : user.name,
     place_id:   selVenue.placeId,
     place_name: selVenue.name,
     address:    selVenue.address,
@@ -686,6 +752,7 @@ function resetForm(){
   selRating=0; selVenue=null; window._p=null;
   clearVenue();
   ['f-salary','f-comment','f-chores-other'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-anon').checked=false;
   document.querySelectorAll('input[name="pay"],input[name="alone"],input[name="chores"]')
     .forEach(el=>el.checked=false);
   document.querySelectorAll('.rbtn').forEach(b=>b.classList.remove('active'));
