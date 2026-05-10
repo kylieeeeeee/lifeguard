@@ -685,6 +685,13 @@ function applyTile(dark){
     attribution:'© <a href="https://www.openstreetmap.org/copyright">OSM</a> © <a href="https://carto.com/">CARTO</a>',
     subdomains:'abcd',maxZoom:19
   }).addTo(map);
+  // 重新補上自訂連結
+  setTimeout(()=>{
+    const attr=document.querySelector('.leaflet-control-attribution');
+    if(attr && !document.getElementById('attr-privacy')){
+      attr.innerHTML += ` | <a href="/privacy" target="_blank" id="attr-privacy">${t('privacy')}</a> | <a onclick="openContact(null,null)" style="cursor:pointer;" id="attr-contact">${t('contact-admin')}</a>`;
+    }
+  }, 100);
 }
 
 function setTheme(t){
@@ -1243,14 +1250,6 @@ window.addEventListener('resize',alignActionBtn);
 
 // 載入已審核回報 + 等地圖 ready
 loadReports();
-
-// 把隱私權政策加到 Leaflet attribution 旁邊（用固定 id 方便切語言更新）
-map.whenReady(()=>{
-  setTimeout(()=>{
-    const attr = document.querySelector('.leaflet-control-attribution');
-    if(attr) attr.innerHTML += ` | <a href="/privacy" target="_blank" id="attr-privacy">${t('privacy')}</a> | <a onclick="openContact(null,null)" style="cursor:pointer;" id="attr-contact">${t('contact-admin')}</a>`;
-  }, 300);
-});
 </script>
 <!-- 隱私權政策靜態連結（供 Google 爬蟲索引） -->
 <a href="/privacy" style="display:none;" aria-hidden="true">隱私權政策 Privacy Policy</a>
