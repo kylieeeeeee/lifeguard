@@ -378,7 +378,13 @@ const SUPABASE_KEY  = 'sb_publishable_AbidJYNYkRcpXqj49kscCQ_VMWZlx2L';
 const GOOGLE_KEY    = 'AIzaSyCq0qDCSrGaH_RYEjc7g0Ny9UQ_12it65k';
 /* ════════════════════════════════════════ */
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    flowType: 'pkce',
+    detectSessionInUrl: true,
+    persistSession: true
+  }
+});
 
 /* ══ CONSTANTS ══ */
 const C = {1:'#dc2626',2:'#ea580c',3:'#ca8a04',4:'#16a34a',5:'#06b6d4'};
