@@ -28,7 +28,7 @@
 }
 html,body{height:100%;overflow:hidden;}
 body{font-family:'Noto Sans TC','PingFang TC',sans-serif;background:var(--bg);color:var(--text);}
-#map{width:100%;height:100vh;}
+#map{width:100%;height:100dvh;}
 .topbar{position:absolute;top:0;left:0;right:0;z-index:1000;
   background:linear-gradient(180deg,var(--topbar) 0%,transparent 100%);
   padding:16px 20px 48px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;}
@@ -845,6 +845,14 @@ window.addEventListener('resize',alignActionBtn);
 
 // 載入已審核回報 + 等地圖 ready
 loadReports();
+
+// 把隱私權政策加到 Leaflet attribution 旁邊
+map.whenReady(()=>{
+  setTimeout(()=>{
+    const attr = document.querySelector('.leaflet-control-attribution');
+    if(attr) attr.innerHTML += ' | <a href="/privacy" target="_blank">隱私權政策</a>';
+  }, 300);
+});
 </script>
 </body>
 </html>
