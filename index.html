@@ -34,7 +34,7 @@ body{font-family:'Noto Sans TC','PingFang TC',sans-serif;background:var(--bg);co
   padding:12px 14px 48px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;}
 .logo{pointer-events:all;display:flex;align-items:center;gap:10px;}
 .logo-mark{font-size:28px;line-height:1;display:flex;align-items:center;}
-.logo-text{font-size:17px;font-weight:900;color:var(--text);letter-spacing:-.02em;}
+.logo-text{font-size:17px;font-weight:900;color:var(--text);letter-spacing:-.02em;min-width:160px;}
 .topbar-right{pointer-events:all;display:flex;align-items:center;gap:6px;flex-shrink:0;}
 .theme-toggle{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;height:32px;}
 .tbtn{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:0 10px;font-size:13px;transition:all .15s;height:100%;}
@@ -554,6 +554,7 @@ function setLang(l){
   lang = l;
   localStorage.setItem('lang', l);
   document.documentElement.setAttribute('lang', l==='zh'?'zh-TW':'en');
+  document.title = l==='zh' ? '救生員避雷地圖 | Lifeguard Radar' : 'LIFEGUARD RADAR | 救生員避雷地圖';
   ['zh','en'].forEach(x=>document.getElementById('btn-'+x).classList.toggle('active',x===l));
   applyI18n();
 }
@@ -567,7 +568,11 @@ function applyI18n(){
   // dynamic elements
   const ul=document.getElementById('user-label');
   if(ul) ul.textContent = user ? t('user-label-post') : t('user-label-pre');
-  // placeholder updates
+  // 更新 attribution 連結文字
+  const ap=document.getElementById('attr-privacy');
+  const ac=document.getElementById('attr-contact');
+  if(ap) ap.textContent=t('privacy');
+  if(ac) ac.textContent=t('contact-admin');
   const vi=document.getElementById('v-input');
   if(vi) vi.placeholder=t('venue-placeholder');
   const fs=document.getElementById('f-salary');
@@ -1059,7 +1064,7 @@ function toast(msg,type){ showToast(msg,type); }
 // 語言：優先用 localStorage，其次偵測系統語言
 const savedLang = localStorage.getItem('lang');
 const sysLang = navigator.language || navigator.userLanguage || 'zh';
-const initLang = savedLang || (sysLang.startsWith('zh') ? 'zh' : 'en');
+const initLang = savedLang || (sysLang.startsWith('en') ? 'en' : 'zh');
 setLang(initLang);
 
 setTheme('light');
@@ -1087,11 +1092,11 @@ window.addEventListener('resize',alignActionBtn);
 // 載入已審核回報 + 等地圖 ready
 loadReports();
 
-// 把隱私權政策加到 Leaflet attribution 旁邊
+// 把隱私權政策加到 Leaflet attribution 旁邊（用固定 id 方便切語言更新）
 map.whenReady(()=>{
   setTimeout(()=>{
     const attr = document.querySelector('.leaflet-control-attribution');
-    if(attr) attr.innerHTML += ` | <a href="/privacy" target="_blank">${t('privacy')}</a> | <a onclick="openContact(null,null)" style="cursor:pointer;">${t('contact-admin')}</a>`;
+    if(attr) attr.innerHTML += ` | <a href="/privacy" target="_blank" id="attr-privacy">${t('privacy')}</a> | <a onclick="openContact(null,null)" style="cursor:pointer;" id="attr-contact">${t('contact-admin')}</a>`;
   }, 300);
 });
 </script>
