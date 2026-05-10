@@ -461,7 +461,7 @@ function popHTML(pid, idx){
     <div class="popup-row">🧹 雜事：<span>${chores}</span></div>
     <div class="popup-row">👤 獨立當班：<span>${r.alone}</span></div>
     ${r.comment?`<div class="popup-comment">💬 ${r.comment}</div>`:''}
-    <div class="popup-mod">若需修改，請 <a href="mailto:admin@example.com">聯絡管理員</a></div>
+    <div class="popup-mod">若需修改，請 <a href="mailto:b34104015@gs.ncku.edu.tw">聯絡管理員</a></div>
   </div>`;
 }
 
@@ -816,6 +816,14 @@ function toast(msg,type){ showToast(msg,type); }
 
 /* ══ INIT ══ */
 setTheme('light');
+
+// OAuth redirect 回來時，網址 hash 裡有 token，讓 Supabase 處理後清掉
+if (window.location.hash && window.location.hash.includes('access_token')) {
+  sb.auth.getSession().then(() => {
+    // 清掉網址 hash，避免 token 外露
+    history.replaceState(null, '', window.location.pathname);
+  });
+}
 map.on('click',()=>document.getElementById('ac-drop').classList.remove('open'));
 
 function alignActionBtn(){
