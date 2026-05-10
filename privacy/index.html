@@ -1,239 +1,207 @@
 <!DOCTYPE html>
-<html lang="zh-TW" data-theme="light">
+<html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>救生員避雷地圖 Lifeguard Radar</title>
+<title>隱私權政策 | 救生員避雷地圖</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛟</text></svg>">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<!-- ★ Supabase SDK ★ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;}
-:root,[data-theme="light"]{
-  --bg:#eef2f7;--surface:#fff;--surface2:#f3f7fb;--surface3:#e6eef7;
+:root{
+  --bg:#f5f7fa;--surface:#fff;--surface2:#f3f7fb;--surface3:#e6eef7;
   --accent:#0891b2;--accent2:#0e7490;--accent-glow:rgba(8,145,178,.18);
-  --text:#1a2e42;--text-muted:#6b8aab;--border:#c8d9eb;
-  --topbar:rgba(238,242,247,.95);--shadow:rgba(0,30,70,.12);--overlay:rgba(90,120,160,.38);
-  --input-bg:#f3f7fb;--popup-bg:#fff;--popup-border:#c8d9eb;
+  --text:#1a2e42;--text-muted:#6b8aab;--border:#c8d9eb;--shadow:rgba(0,30,70,.12);
+  --overlay:rgba(90,120,160,.38);--input-bg:#f3f7fb;
 }
 [data-theme="dark"]{
   --bg:#060d18;--surface:#0c1929;--surface2:#101f33;--surface3:#152540;
   --accent:#06b6d4;--accent2:#0891b2;--accent-glow:rgba(6,182,212,.25);
-  --text:#dde7f0;--text-muted:#4d6a85;--border:#1a3050;
-  --topbar:rgba(6,13,24,.95);--shadow:rgba(0,0,0,.55);--overlay:rgba(6,13,24,.72);
-  --input-bg:#101f33;--popup-bg:#0c1929;--popup-border:#1a3050;
+  --text:#dde7f0;--text-muted:#4d6a85;--border:#1a3050;--shadow:rgba(0,0,0,.55);
+  --overlay:rgba(6,13,24,.72);--input-bg:#101f33;
 }
-html,body{height:100%;overflow:hidden;}
-body{font-family:'Noto Sans TC','PingFang TC',sans-serif;background:var(--bg);color:var(--text);}
-#map{width:100%;height:100dvh;}
-.topbar{position:absolute;top:0;left:0;right:0;z-index:1000;
-  background:linear-gradient(180deg,var(--topbar) 0%,transparent 100%);
-  padding:12px 14px 48px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;}
-.logo{pointer-events:all;display:flex;align-items:center;gap:10px;}
+html,body{min-height:100%;background:var(--bg);color:var(--text);}
+body{font-family:'Noto Sans TC','PingFang TC',sans-serif;line-height:1.8;}
+
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;
+  display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
 .logo-mark{font-size:28px;line-height:1;display:flex;align-items:center;}
 .logo-text{font-size:17px;font-weight:900;color:var(--text);letter-spacing:-.02em;min-width:160px;}
-.topbar-right{pointer-events:all;display:flex;align-items:center;gap:6px;flex-shrink:0;}
-.theme-toggle{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;height:32px;}
-.tbtn{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:0 10px;font-size:13px;transition:all .15s;height:100%;}
+.header-right{display:flex;align-items:center;gap:6px;}
+.toggle-group{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;height:32px;}
+.tbtn{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:0 10px;font-size:13px;height:100%;font-family:inherit;transition:all .15s;}
 .tbtn.active{background:var(--accent);color:#fff;}
-.stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 14px;text-align:center;}
-.stat-num{font-size:20px;font-weight:900;color:var(--accent);line-height:1;}
-.stat-label{font-size:10px;color:var(--text-muted);margin-top:2px;}
-.logout-btn{display:none;background:var(--surface2);border:1px solid var(--border);border-radius:8px;
-  color:var(--text-muted);cursor:pointer;padding:7px 12px;font-size:12px;font-weight:600;
-  font-family:inherit;transition:all .15s;}
-.logout-btn:hover{border-color:#dc2626;color:#dc2626;}
-.legend{position:absolute;bottom:30px;left:18px;z-index:1000;
-  background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;}
-.legend-title{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px;}
-.legend-item{display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:5px;color:var(--text);}
-.legend-item:last-child{margin-bottom:0;}
-.ldot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-.action-btn{position:absolute;bottom:16px;right:48px;z-index:1000;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  color:#fff;border:none;border-radius:50px;padding:11px 20px;
-  font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;
-  box-shadow:0 0 20px var(--accent-glow),0 4px 16px var(--shadow);
-  transition:all .2s;display:flex;align-items:center;gap:7px;white-space:nowrap;}
-.action-btn:hover{transform:translateY(-2px);}
-.overlay{position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(10px);z-index:2000;
-  display:none;align-items:center;justify-content:center;padding:16px;}
+.back-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+  color:var(--text-muted);padding:0 12px;font-size:12px;font-weight:600;
+  font-family:inherit;height:32px;text-decoration:none;display:flex;align-items:center;white-space:nowrap;transition:all .15s;}
+.back-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+main{max-width:720px;margin:0 auto;padding:40px 24px 80px;}
+h1{font-size:22px;font-weight:900;color:var(--accent);margin-bottom:6px;}
+.updated{font-size:12px;color:var(--text-muted);margin-bottom:32px;}
+h2{font-size:15px;font-weight:700;color:var(--text);margin:28px 0 8px;padding-left:10px;border-left:3px solid var(--accent);}
+h3{font-size:13px;font-weight:700;color:var(--text);margin:16px 0 6px;}
+p{font-size:14px;color:var(--text-muted);margin-bottom:10px;}
+ul{font-size:14px;color:var(--text-muted);padding-left:18px;margin-bottom:10px;}
+ul li{margin-bottom:5px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:14px;}
+
+.contact-bar{background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+  padding:16px 20px;margin-top:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.contact-bar-text{font-size:13px;color:var(--text-muted);}
+.contact-bar-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;
+  border:none;border-radius:8px;padding:9px 18px;font-family:inherit;font-size:13px;
+  font-weight:700;cursor:pointer;}
+
+footer{text-align:center;font-size:12px;color:var(--text-muted);padding:24px;border-top:1px solid var(--border);}
+
+/* ── OVERLAY / MODAL ── */
+.overlay{position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(10px);
+  z-index:2000;display:none;align-items:center;justify-content:center;padding:16px;}
 .overlay.open{display:flex;}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;width:100%;max-width:480px;
-  max-height:90vh;overflow-y:auto;padding:24px 26px;box-shadow:0 30px 70px var(--shadow);animation:slideUp .22s ease;}
-.modal::-webkit-scrollbar{width:4px;}
-.modal::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;
+  width:100%;max-width:440px;padding:24px 26px;box-shadow:0 30px 70px var(--shadow);animation:slideUp .22s ease;}
 @keyframes slideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-.modal-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;}
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;}
 .modal-title{font-size:17px;font-weight:900;color:var(--text);}
-.modal-subtitle{font-size:11px;color:var(--accent);margin-top:3px;letter-spacing:.06em;}
-.close{width:30px;height:30px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;
-  color:var(--text-muted);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;
-  transition:all .15s;flex-shrink:0;}
+.close{width:30px;height:30px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:7px;color:var(--text-muted);cursor:pointer;font-size:15px;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;}
 .close:hover{border-color:var(--accent);color:var(--accent);}
-.login-modal{max-width:360px;}
-.login-logo{text-align:center;margin-bottom:18px;}
-.big-emoji{font-size:48px;display:block;margin-bottom:6px;}
-.login-desc{font-size:13px;color:var(--text-muted);text-align:center;margin-bottom:20px;line-height:1.7;}
-.google-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
-  padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);
-  color:var(--text);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;}
-.google-btn:hover{border-color:var(--accent);background:var(--surface3);}
-.gicon{width:20px;height:20px;flex-shrink:0;}
-.fg{margin-bottom:16px;}
+.fg{margin-bottom:14px;}
 .flabel{display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px;}
 .req{color:var(--accent);margin-left:2px;}
-.venue-wrap{position:relative;}
 .finput{width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:9px;
-  padding:10px 12px;color:var(--text);font-family:inherit;font-size:14px;outline:none;transition:border-color .15s;}
+  padding:10px 12px;color:var(--text);font-family:inherit;font-size:14px;outline:none;}
 .finput:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow);}
 .finput::placeholder{color:var(--text-muted);}
-textarea.finput{resize:vertical;min-height:75px;}
-.ac-drop{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:200;background:var(--surface);
-  border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 8px 24px var(--shadow);display:none;}
-.ac-drop.open{display:block;}
-.ac-item{padding:10px 13px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border);transition:background .12s;}
-.ac-item:last-child{border-bottom:none;}
-.ac-item:hover{background:var(--surface2);}
-.ac-name{font-weight:700;color:var(--text);}
-.ac-addr{font-size:11px;color:var(--text-muted);margin-top:2px;}
-.ac-msg{padding:10px 13px;font-size:13px;color:var(--text-muted);}
-.ac-locked{display:flex;align-items:center;gap:8px;background:rgba(8,145,178,.08);
-  border:1px solid rgba(8,145,178,.3);border-radius:9px;padding:9px 12px;font-size:13px;}
-.ac-locked-info{flex:1;}
-.ac-locked-name{font-weight:700;color:var(--accent);}
-.ac-locked-addr{font-size:11px;color:var(--text-muted);margin-top:2px;}
-.ac-clear{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;padding:0 2px;}
-.ac-hint{font-size:11px;margin-top:5px;}
-.ac-hint.ok{color:var(--accent);}
-.ac-hint.warn{color:#ea580c;}
+textarea.finput{resize:vertical;min-height:90px;}
 .choice-group{display:flex;flex-direction:column;gap:6px;}
 .choice{display:flex;align-items:center;gap:9px;background:var(--surface2);border:1px solid var(--border);
-  border-radius:9px;padding:9px 12px;cursor:pointer;font-size:13px;color:var(--text);
-  transition:all .12s;user-select:none;}
+  border-radius:9px;padding:9px 12px;cursor:pointer;font-size:13px;color:var(--text);}
 .choice:hover{border-color:var(--accent);}
 .choice input{accent-color:var(--accent);width:14px;height:14px;flex-shrink:0;}
-.fdivider{height:1px;background:var(--border);margin:4px 0 16px;}
-.rating-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-bottom:6px;}
-.rating-row{display:flex;gap:6px;}
-.rbtn{flex:1;height:42px;border-radius:9px;border:2px solid var(--border);background:var(--surface2);
-  color:var(--text-muted);font-size:14px;font-weight:900;cursor:pointer;transition:all .15s;font-family:inherit;}
-.rbtn[data-v="1"].active{background:#dc2626;border-color:#dc2626;color:#fff;}
-.rbtn[data-v="2"].active{background:#ea580c;border-color:#ea580c;color:#fff;}
-.rbtn[data-v="3"].active{background:#ca8a04;border-color:#ca8a04;color:#fff;}
-.rbtn[data-v="4"].active{background:#16a34a;border-color:#16a34a;color:#fff;}
-.rbtn[data-v="5"].active{background:#06b6d4;border-color:#06b6d4;color:#fff;}
-.submit{width:100%;margin-top:4px;background:linear-gradient(135deg,var(--accent),var(--accent2));
-  color:#fff;border:none;border-radius:10px;padding:13px;font-family:inherit;font-size:14px;
-  font-weight:700;cursor:pointer;transition:all .2s;}
-.submit:hover{transform:translateY(-1px);}
-.submit:disabled{opacity:.4;cursor:not-allowed;transform:none;}
-.confirm-modal{max-width:420px;}
-.confirm-block{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;}
-.c-venue{font-size:15px;font-weight:900;color:var(--text);margin-bottom:2px;}
-.c-addr{font-size:11px;color:var(--text-muted);margin-bottom:10px;}
-.c-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:10px;}
-.c-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;color:var(--text-muted);}
-.c-row span{color:var(--text);font-weight:600;text-align:right;max-width:58%;}
-.c-comment{font-size:12px;color:var(--text-muted);margin-top:8px;padding-top:8px;
-  border-top:1px solid var(--border);line-height:1.6;font-style:italic;}
-.confirm-notice{font-size:11px;color:#dc2626;text-align:center;margin-bottom:14px;line-height:1.6;font-weight:600;}
-.confirm-btns{display:flex;gap:8px;}
-.btn-back{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;
-  padding:12px;font-family:inherit;font-size:14px;font-weight:700;color:var(--text);cursor:pointer;}
-.btn-go{flex:2;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;
-  border-radius:10px;padding:12px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;}
-.btn-go:disabled{opacity:.4;cursor:not-allowed;}
-.toast{position:fixed;bottom:76px;right:18px;z-index:4000;background:#065f46;border:1px solid #059669;
-  color:#d1fae5;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:600;
-  transform:translateY(70px);opacity:0;transition:all .3s;pointer-events:none;}
+.submit-btn{width:100%;margin-top:4px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;border:none;border-radius:10px;padding:13px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+.toast{position:fixed;bottom:24px;right:20px;z-index:4000;background:#065f46;
+  border:1px solid #059669;color:#d1fae5;padding:12px 18px;border-radius:10px;
+  font-size:13px;font-weight:600;transform:translateY(70px);opacity:0;transition:all .3s;pointer-events:none;}
 .toast.err{background:#7f1d1d;border-color:#dc2626;color:#fecaca;}
 .toast.show{transform:translateY(0);opacity:1;}
-.leaflet-popup-content-wrapper{background:var(--popup-bg)!important;border:1px solid var(--popup-border)!important;
-  border-radius:14px!important;box-shadow:0 12px 40px var(--shadow)!important;color:var(--text)!important;padding:0!important;}
-.leaflet-popup-tip-container{display:none!important;}
-.leaflet-popup-content{margin:0!important;min-width:260px;}
-.popup-head{padding:14px 16px 10px;}
-.popup-name{font-size:15px;font-weight:900;color:var(--text);margin-bottom:2px;}
-.popup-addr{font-size:11px;color:var(--text-muted);}
-.popup-badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-top:7px;}
-.popup-avg{font-size:11px;color:var(--text-muted);margin-top:5px;}
-.popup-avg b{color:var(--accent);}
-.popup-nav{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;
-  border-top:1px solid var(--popup-border);border-bottom:1px solid var(--popup-border);background:var(--surface2);}
-.nav-arr{background:none;border:1px solid var(--popup-border);border-radius:6px;color:var(--text);
-  cursor:pointer;width:28px;height:28px;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .12s;}
-.nav-arr:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
-.nav-arr:disabled{opacity:.3;cursor:not-allowed;}
-.nav-mid{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-muted);}
-.nav-in{width:36px;height:26px;background:var(--surface);border:1px solid var(--popup-border);
-  border-radius:5px;text-align:center;color:var(--text);font-family:inherit;font-size:12px;font-weight:700;outline:none;}
-.nav-in:focus{border-color:var(--accent);}
-.popup-body{padding:12px 16px 14px;}
-.popup-row{font-size:12px;color:var(--text-muted);margin-bottom:5px;}
-.popup-row span{color:var(--text);font-weight:600;}
-.popup-comment{font-size:12px;color:var(--text-muted);margin-top:9px;padding-top:9px;
-  border-top:1px solid var(--popup-border);line-height:1.6;}
-.popup-mod{font-size:11px;color:var(--text-muted);margin-top:10px;padding-top:9px;
-  border-top:1px solid var(--popup-border);text-align:center;}
-.popup-mod a{color:var(--accent);text-decoration:none;cursor:pointer;}
-.contact-modal{max-width:420px;}
+
+/* LOGIN */
+.login-modal{max-width:360px;}
+.login-logo{text-align:center;margin-bottom:14px;}
+.big-emoji{font-size:44px;}
+.login-desc{font-size:13px;color:var(--text-muted);text-align:center;margin-bottom:18px;line-height:1.7;}
+.google-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);
+  color:var(--text);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+.google-btn:hover{border-color:var(--accent);}
+.gicon{width:20px;height:20px;flex-shrink:0;}
 </style>
 </head>
-<body>
-<div id="map"></div>
+<body data-theme="light">
 
-<div class="topbar">
-  <div class="logo">
+<header>
+  <a class="logo" href="/">
     <div class="logo-mark">🛟</div>
-    <div>
-      <div class="logo-text" data-i18n="logo-text">救生員避雷地圖</div>
-    </div>
-  </div>
-  <div class="topbar-right">
-    <div class="theme-toggle">
-      <button class="tbtn" id="btn-light" onclick="setTheme('light')" title="淺色">☀️</button>
-      <button class="tbtn" id="btn-dark"  onclick="setTheme('dark')"  title="深色">🌙</button>
-    </div>
-    <div class="theme-toggle">
+    <div class="logo-text" id="logo-text">救生員避雷地圖</div>
+  </a>
+  <div class="header-right">
+    <div class="toggle-group">
       <button class="tbtn" id="btn-zh" onclick="setLang('zh')">中</button>
       <button class="tbtn" id="btn-en" onclick="setLang('en')">EN</button>
     </div>
-    <div class="stat-card">
-      <div class="stat-num" id="stat-total">0</div>
-      <div class="stat-label" data-i18n="stat-label">總回報數</div>
-    </div>
-    <button class="logout-btn" id="logout-btn" onclick="logout()" data-i18n="logout">登出</button>
+    <a class="back-btn" href="/" id="back-btn">← 返回地圖</a>
   </div>
-</div>
+</header>
 
-<div class="legend">
-  <div class="legend-title" data-i18n="legend-title">避雷評分</div>
-  <div class="legend-item"><div class="ldot" style="background:#dc2626"></div><span data-i18n="r1">1 超雷</span></div>
-  <div class="legend-item"><div class="ldot" style="background:#ea580c"></div><span data-i18n="r2">2 偏雷</span></div>
-  <div class="legend-item"><div class="ldot" style="background:#ca8a04"></div><span data-i18n="r3">3 普通</span></div>
-  <div class="legend-item"><div class="ldot" style="background:#16a34a"></div><span data-i18n="r4">4 不錯</span></div>
-  <div class="legend-item"><div class="ldot" style="background:#06b6d4"></div><span data-i18n="r5">5 超推</span></div>
-</div>
+<main>
+  <h1 id="page-title">隱私權政策與服務條款</h1>
+  <div class="updated" id="updated">最後更新：2026 年 5 月</div>
 
-<button class="action-btn" id="action-btn" onclick="handleUserBtn()">
-  <span id="user-label">登入後回報</span>
-</button>
+  <div class="card">
+    <h2 id="privacy-title">一、隱私權政策</h2>
 
-<!-- LOGIN -->
-<div class="overlay" id="ov-login" onclick="ovClick(event,'ov-login')">
+    <h3 id="collect-title">我們蒐集的資料</h3>
+    <p id="collect-desc">當您使用 Google 帳號登入時，我們會取得：</p>
+    <ul id="collect-list">
+      <li>Google 帳號的唯一識別碼（User ID）</li>
+      <li>顯示名稱（用於回報者標示）</li>
+      <li>電子郵件地址（僅用於帳號識別，不對外顯示）</li>
+    </ul>
+
+    <h3 id="report-data-title">回報內容</h3>
+    <p id="report-data-desc">您提交的場館工作回報內容（包含場館名稱、薪資、工作條件、心得等）將儲存於我們的資料庫，並在審核通過後公開顯示於地圖上。若您選擇「匿名提交」，您的名稱將不會出現在回報中，但您的帳號 ID 仍會記錄以防止重複回報。</p>
+
+    <h3 id="usage-title">資料使用方式</h3>
+    <ul id="usage-list">
+      <li>顯示於救生員避雷地圖供其他使用者參考</li>
+      <li>防止同一帳號對同一場館重複回報</li>
+      <li>由 AI 自動審核回報內容是否合規</li>
+    </ul>
+
+    <h3 id="storage-title">資料儲存與安全</h3>
+    <p id="storage-desc">所有資料儲存於 Supabase（PostgreSQL 資料庫），位於 ap-southeast-1 區域。我們採用行列安全政策（RLS）保護資料，未審核的回報不對外公開。</p>
+
+    <h3 id="third-party-title">第三方服務</h3>
+    <ul id="third-party-list">
+      <li>Google OAuth：用於帳號登入驗證</li>
+      <li>Google Places API：用於場館地點搜尋</li>
+      <li>OpenStreetMap / CartoDB：用於地圖底圖顯示</li>
+      <li>Groq AI：用於回報內容初步審核</li>
+    </ul>
+
+    <h3 id="rights-title">您的權利</h3>
+    <p id="rights-desc">您可以隨時透過聯絡管理員要求刪除您的回報資料或帳號資訊。</p>
+  </div>
+
+  <div class="card">
+    <h2 id="terms-title">二、服務條款</h2>
+
+    <h3 id="service-title">服務說明</h3>
+    <p id="service-desc">救生員避雷地圖是一個供救生員分享游泳場館工作條件的平台，所有回報均為使用者自主提交，本站不保證資訊的完整性或即時性。</p>
+
+    <h3 id="user-title">使用者責任</h3>
+    <ul id="user-list">
+      <li>回報內容須為真實的工作經驗，不得惡意造假或蓄意誹謗</li>
+      <li>不得提交廣告、垃圾訊息或與救生員工作無關的內容</li>
+      <li>每個帳號對每個場館只能提交一次回報</li>
+      <li>如需修改回報，請聯絡管理員</li>
+    </ul>
+
+    <h3 id="review-title">內容審核</h3>
+    <p id="review-desc">所有回報提交後會先經過 AI 初步審核，再由管理員人工確認。不符合規定的回報將被拒絕或下架，管理員保有最終決定權。</p>
+
+    <h3 id="disclaimer-title">免責聲明</h3>
+    <p id="disclaimer-desc">本站提供的資訊僅供參考，所有回報內容為使用者個人意見，不代表本站立場。使用者應自行判斷資訊的適用性，本站對因使用本站資訊而產生的任何損失不負責任。</p>
+
+    <h3 id="change-title">服務變更</h3>
+    <p id="change-desc">本站保留隨時修改或終止服務的權利，條款如有變更將於本頁面更新。</p>
+  </div>
+
+  <div class="contact-bar">
+    <div class="contact-bar-text" id="contact-bar-text">如有任何問題或需要刪除資料，請聯絡管理員</div>
+    <button class="contact-bar-btn" id="contact-bar-btn" onclick="openContact()">聯絡管理員</button>
+  </div>
+</main>
+
+<footer id="footer-text">© 2026 救生員避雷地圖 LIFEGUARD RADAR</footer>
+
+<!-- LOGIN OVERLAY -->
+<div class="overlay" id="ov-login" onclick="if(event.target.id==='ov-login')closeOv('ov-login')">
   <div class="modal login-modal">
     <div class="modal-head">
-      <div><div class="modal-title" data-i18n="login-title">登入後才能回報</div></div>
+      <div class="modal-title" id="login-title">登入後才能聯絡管理員</div>
       <button class="close" onclick="closeOv('ov-login')">✕</button>
     </div>
     <div class="login-logo"><span class="big-emoji">🛟</span></div>
-    <div class="login-desc" data-i18n="login-desc">
-      登入後才能提交回報。<br>每個帳號每個場館只能回報一次。<br>若需修改請聯絡管理員。
-    </div>
+    <div class="login-desc" id="login-desc">請先使用 Google 帳號登入，才能送出訊息給管理員。</div>
     <button class="google-btn" onclick="loginWithGoogle()">
       <svg class="gicon" viewBox="0 0 48 48">
         <path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 2.9l5.7-5.7C34.5 6.5 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.6-.4-3.9z"/>
@@ -241,310 +209,138 @@ textarea.finput{resize:vertical;min-height:75px;}
         <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.3 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8H6.3C9.6 35.7 16.3 44 24 44z"/>
         <path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l6.2 5.2C40.8 36.1 44 30.5 44 24c0-1.3-.1-2.6-.4-3.9z"/>
       </svg>
-      <span data-i18n="google-login">使用 Google 帳號登入</span>
+      <span id="google-login-btn">使用 Google 帳號登入</span>
     </button>
   </div>
 </div>
 
-<!-- REPORT -->
-<div class="overlay" id="ov-report" onclick="ovClick(event,'ov-report')">
+<!-- CONTACT OVERLAY -->
+<div class="overlay" id="ov-contact" onclick="if(event.target.id==='ov-contact')closeOv('ov-contact')">
   <div class="modal">
     <div class="modal-head">
-      <div>
-        <div class="modal-title" data-i18n="report-title">場館工作內容回報</div>
-        <div class="modal-subtitle" id="report-sub">救生員避雷地圖</div>
-      </div>
-      <button class="close" onclick="closeOv('ov-report')">✕</button>
-    </div>
-    <div class="fg">
-      <label class="flabel"><span data-i18n="venue-label">場館名稱或地址</span><span class="req">*</span></label>
-      <div class="venue-wrap">
-        <div id="v-locked" style="display:none" class="ac-locked">
-          <div class="ac-locked-info">
-            <div class="ac-locked-name" id="v-locked-name"></div>
-            <div class="ac-locked-addr" id="v-locked-addr"></div>
-          </div>
-          <button class="ac-clear" onclick="clearVenue()" title="重新選擇">✕</button>
-        </div>
-        <input id="v-input" class="finput" type="text" autocomplete="off"
-          placeholder="搜尋場館名稱，例：南港運動中心"
-          oninput="onVI()" onfocus="onVF()">
-        <div class="ac-drop" id="ac-drop"></div>
-      </div>
-      <div class="ac-hint" id="v-hint"></div>
-      <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">
-        <span data-i18n="map-pick-hint">找不到場館？可直接在地圖上點選位置 →</span>
-        <button onclick="startMapPick()" style="background:none;border:none;color:var(--accent);
-          cursor:pointer;font-size:11px;font-weight:700;padding:0;font-family:inherit;" data-i18n="map-pick-btn">點這裡開啟地圖選點</button>
-      </div>
-    </div>
-    <div class="fdivider"></div>
-    <div class="fg">
-      <label class="flabel"><span data-i18n="pay-label">給薪模式</span><span class="req">*</span></label>
-      <div class="choice-group">
-        <label class="choice"><input type="radio" name="pay" value="時薪制"> <span data-i18n="pay-hourly">時薪制</span></label>
-        <label class="choice"><input type="radio" name="pay" value="月薪制"> <span data-i18n="pay-monthly">月薪制</span></label>
-      </div>
-    </div>
-    <div class="fg">
-      <label class="flabel"><span data-i18n="salary-label">薪資水準</span><span class="req">*</span></label>
-      <input id="f-salary" class="finput" type="text" placeholder="例：時薪 190，或月薪 36,000">
-    </div>
-    <div class="fdivider"></div>
-    <div class="fg">
-      <label class="flabel"><span data-i18n="chores-label">是否需要負擔雜事</span><span class="req">*</span></label>
-      <div class="choice-group">
-        <label class="choice"><input type="checkbox" name="chores" value="無"> <span data-i18n="chore-none">無</span></label>
-        <label class="choice"><input type="checkbox" name="chores" value="清潔場地"> <span data-i18n="chore-clean">清潔場地</span></label>
-        <label class="choice"><input type="checkbox" name="chores" value="清潔廁所"> <span data-i18n="chore-toilet">清潔廁所</span></label>
-        <label class="choice"><input type="checkbox" name="chores" value="機房操作"> <span data-i18n="chore-pump">機房操作</span></label>
-        <label class="choice"><input type="checkbox" name="chores" value="加藥"> <span data-i18n="chore-drug">加藥</span></label>
-        <label class="choice"><input type="checkbox" name="chores" value="兼任櫃台"> <span data-i18n="chore-counter">兼任櫃台</span></label>
-      </div>
-      <input id="f-chores-other" class="finput" style="margin-top:7px" type="text" placeholder="其他雜事（選填）">
-    </div>
-    <div class="fg">
-      <label class="flabel"><span data-i18n="alone-label">是否常態性獨立當班</span><span class="req">*</span></label>
-      <div class="choice-group">
-        <label class="choice"><input type="radio" name="alone" value="是，常需獨自承擔風險"> <span data-i18n="alone-yes">是，常需獨自承擔風險</span></label>
-        <label class="choice"><input type="radio" name="alone" value="否，人力符合規定"> <span data-i18n="alone-no">否，人力符合規定</span></label>
-      </div>
-    </div>
-    <div class="fdivider"></div>
-    <div class="fg">
-      <label class="flabel"><span data-i18n="rating-label">整體避雷評分</span><span class="req">*</span></label>
-      <div class="rating-labels"><span data-i18n="rating-bad">⚡ 超雷</span><span></span><span data-i18n="rating-mid">普通</span><span></span><span data-i18n="rating-good">🏊 超推</span></div>
-      <div class="rating-row">
-        <button class="rbtn" data-v="1" onclick="setRating(1)">1</button>
-        <button class="rbtn" data-v="2" onclick="setRating(2)">2</button>
-        <button class="rbtn" data-v="3" onclick="setRating(3)">3</button>
-        <button class="rbtn" data-v="4" onclick="setRating(4)">4</button>
-        <button class="rbtn" data-v="5" onclick="setRating(5)">5</button>
-      </div>
-    </div>
-    <div class="fg">
-      <label class="flabel" data-i18n="comment-label">血淚心得或推薦理由</label>
-      <textarea id="f-comment" class="finput" placeholder="分享工作體驗，幫助同業避雷！"></textarea>
-    </div>
-    <label class="choice" style="margin-bottom:14px;">
-      <input type="checkbox" id="f-anon"> <span data-i18n="anon-label">匿名提交（不顯示你的名稱）</span>
-    </label>
-    <button class="submit" id="submit-btn" onclick="openConfirm()" data-i18n="submit-btn">確認送出</button>
-  </div>
-</div>
-
-<!-- CONFIRM -->
-<div class="overlay" id="ov-confirm" onclick="ovClick(event,'ov-confirm')">
-  <div class="modal confirm-modal">
-    <div class="modal-head">
-      <div>
-        <div class="modal-title" data-i18n="confirm-title">確認送出回報？</div>
-      </div>
-      <button class="close" onclick="closeOv('ov-confirm')">✕</button>
-    </div>
-    <div class="confirm-block">
-      <div class="c-venue" id="c-name"></div>
-      <div class="c-addr"  id="c-addr"></div>
-      <div class="c-badge" id="c-badge"></div>
-      <div class="c-row"><span data-i18n="confirm-pay">給薪模式</span> <span id="c-pay"></span></div>
-      <div class="c-row"><span data-i18n="confirm-salary">薪資水準</span> <span id="c-salary"></span></div>
-      <div class="c-row"><span data-i18n="confirm-chores">雜事負擔</span> <span id="c-chores"></span></div>
-      <div class="c-row"><span data-i18n="confirm-alone">獨立當班</span> <span id="c-alone"></span></div>
-      <div class="c-comment" id="c-comment" style="display:none"></div>
-    </div>
-    <div class="confirm-notice" data-i18n="confirm-notice">⚠️ 每個場館只能回報一次<br>送出後若需修改請聯絡管理員<br>送出後需待管理員審核才會顯示於地圖</div>
-    <div class="confirm-btns">
-      <button class="btn-back" onclick="closeOv('ov-confirm')" data-i18n="btn-back">← 返回修改</button>
-      <button class="btn-go" id="confirm-go" onclick="submitReport()" data-i18n="btn-go">確認送出</button>
-    </div>
-  </div>
-</div>
-
-<!-- CONTACT MODAL -->
-<div class="overlay" id="ov-contact" onclick="ovClick(event,'ov-contact')">
-  <div class="modal contact-modal">
-    <div class="modal-head">
-      <div>
-        <div class="modal-title" data-i18n="contact-title">聯絡管理員</div>
-      </div>
+      <div class="modal-title" id="contact-title">聯絡管理員</div>
       <button class="close" onclick="closeOv('ov-contact')">✕</button>
     </div>
     <div class="fg">
-      <label class="flabel"><span data-i18n="contact-reason-label">聯絡原因</span><span class="req">*</span></label>
+      <label class="flabel"><span id="reason-label">聯絡原因</span><span class="req">*</span></label>
       <div class="choice-group">
-        <label class="choice"><input type="radio" name="contact-type" value="修改回報內容"> <span data-i18n="contact-r1">修改回報內容</span></label>
-        <label class="choice"><input type="radio" name="contact-type" value="刪除我的回報"> <span data-i18n="contact-r2">刪除我的回報</span></label>
-        <label class="choice"><input type="radio" name="contact-type" value="回報資訊有誤"> <span data-i18n="contact-r3">回報資訊有誤</span></label>
-        <label class="choice"><input type="radio" name="contact-type" value="其他問題"> <span data-i18n="contact-r4">其他問題</span></label>
+        <label class="choice"><input type="radio" name="contact-type" value="修改回報內容"> <span id="cr1">修改回報內容</span></label>
+        <label class="choice"><input type="radio" name="contact-type" value="刪除我的回報"> <span id="cr2">刪除我的回報</span></label>
+        <label class="choice"><input type="radio" name="contact-type" value="回報資訊有誤"> <span id="cr3">回報資訊有誤</span></label>
+        <label class="choice"><input type="radio" name="contact-type" value="其他問題"> <span id="cr4">其他問題</span></label>
       </div>
     </div>
     <div class="fg">
-      <label class="flabel"><span data-i18n="contact-msg-label">說明內容</span><span class="req">*</span></label>
-      <textarea id="contact-msg" class="finput" placeholder="請描述你的問題或修改需求..." style="min-height:100px;"></textarea>
+      <label class="flabel"><span id="msg-label">說明內容</span><span class="req">*</span></label>
+      <textarea id="contact-msg" class="finput" placeholder="請描述你的問題或修改需求..." style="min-height:90px;"></textarea>
     </div>
-    <button class="submit" id="contact-submit" onclick="submitContact()" data-i18n="contact-submit">送出</button>
+    <button class="submit-btn" id="contact-submit" onclick="submitContact()">送出</button>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<!-- MAP PICK HINT -->
-<div id="map-pick-hint" style="display:none;position:fixed;top:0;left:0;right:0;z-index:1500;
-  background:rgba(8,145,178,.92);color:#fff;padding:14px 20px;
-  align-items:center;justify-content:space-between;font-size:14px;font-weight:700;">
-  <span data-i18n="map-pick-bar">📍 點選地圖上的場館位置</span>
-  <button onclick="cancelMapPick()" style="background:rgba(255,255,255,.2);border:none;border-radius:8px;
-    color:#fff;padding:6px 14px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;" data-i18n="map-pick-cancel">取消</button>
-</div>
-
 <script>
-/* ════════════════════════════════════════
-   ★ 填入你的 Supabase 資訊（只需改這兩行）★
-════════════════════════════════════════ */
-const SUPABASE_URL  = 'https://euinsntybozxjhsddeqm.supabase.co';
-const SUPABASE_KEY  = 'sb_publishable_AbidJYNYkRcpXqj49kscCQ_VMWZlx2L';
-const GOOGLE_KEY    = 'AIzaSyCq0qDCSrGaH_RYEjc7g0Ny9UQ_12it65k';
-/* ════════════════════════════════════════ */
-
+const SUPABASE_URL = 'https://euinsntybozxjhsddeqm.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_AbidJYNYkRcpXqj49kscCQ_VMWZlx2L';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: {
-    flowType: 'pkce',
-    detectSessionInUrl: true,
-    persistSession: true
-  }
+  auth: { flowType:'pkce', detectSessionInUrl:true, persistSession:true }
 });
 
-/* ══ CONSTANTS ══ */
-const C = {1:'#dc2626',2:'#ea580c',3:'#ca8a04',4:'#16a34a',5:'#06b6d4'};
-
-/* ══ I18N ══ */
+let user = null;
 let lang = 'zh';
+
+/* ── I18N ── */
 const DICT = {
   zh:{
     'logo-text':'救生員避雷地圖',
-    'stat-label':'總回報數',
-    'logout':'登出',
-    'legend-title':'避雷評分',
-    'r1':'1 超雷','r2':'2 偏雷','r3':'3 普通','r4':'4 不錯','r5':'5 超推',
-    'user-label-pre':'登入後回報','user-label-post':'立即回報',
-    'login-title':'登入後才能回報',
-    'login-desc':'登入後才能提交回報。<br>每個帳號每個場館只能回報一次。<br>若需修改請聯絡管理員。',
-    'google-login':'使用 Google 帳號登入',
-    'report-title':'場館工作內容回報',
-    'venue-label':'場館名稱或地址',
-    'venue-placeholder':'搜尋場館名稱，例：南港運動中心',
-    'map-pick-hint':'找不到場館？可直接在地圖上點選位置 →',
-    'map-pick-btn':'點這裡開啟地圖選點',
-    'pay-label':'給薪模式',
-    'pay-hourly':'時薪制','pay-monthly':'月薪制',
-    'salary-label':'薪資水準',
-    'salary-placeholder':'例：時薪 190，或月薪 36,000',
-    'chores-label':'是否需要負擔雜事',
-    'chore-none':'無','chore-clean':'清潔場地','chore-toilet':'清潔廁所',
-    'chore-pump':'機房操作','chore-drug':'加藥','chore-counter':'兼任櫃台',
-    'chores-other-placeholder':'其他雜事（選填）',
-    'alone-label':'是否常態性獨立當班',
-    'alone-yes':'是，常需獨自承擔風險','alone-no':'否，人力符合規定',
-    'rating-label':'整體避雷評分',
-    'rating-bad':'⚡ 超雷','rating-good':'🏊 超推','rating-mid':'普通',
-    'comment-label':'血淚心得或推薦理由',
-    'comment-placeholder':'分享工作體驗，幫助同業避雷！',
-    'anon-label':'匿名提交（不顯示你的名稱）',
-    'submit-btn':'確認送出',
-    'confirm-title':'確認送出回報？',
-    'confirm-pay':'給薪模式','confirm-salary':'薪資水準',
-    'confirm-chores':'雜事負擔','confirm-alone':'獨立當班',
-    'confirm-notice':'⚠️ 每個場館只能回報一次<br>送出後若需修改請聯絡管理員<br>送出後需待管理員審核才會顯示於地圖',
-    'btn-back':'← 返回修改','btn-go':'確認送出',
+    'back-btn':'← 返回地圖',
+    'page-title':'隱私權政策與服務條款',
+    'updated':'最後更新：2026 年 5 月',
+    'privacy-title':'一、隱私權政策',
+    'collect-title':'我們蒐集的資料',
+    'collect-desc':'當您使用 Google 帳號登入時，我們會取得：',
+    'collect-list':'<li>Google 帳號的唯一識別碼（User ID）</li><li>顯示名稱（用於回報者標示）</li><li>電子郵件地址（僅用於帳號識別，不對外顯示）</li>',
+    'report-data-title':'回報內容',
+    'report-data-desc':'您提交的場館工作回報內容（包含場館名稱、薪資、工作條件、心得等）將儲存於我們的資料庫，並在審核通過後公開顯示於地圖上。若您選擇「匿名提交」，您的名稱將不會出現在回報中，但您的帳號 ID 仍會記錄以防止重複回報。',
+    'usage-title':'資料使用方式',
+    'usage-list':'<li>顯示於救生員避雷地圖供其他使用者參考</li><li>防止同一帳號對同一場館重複回報</li><li>由 AI 自動審核回報內容是否合規</li>',
+    'storage-title':'資料儲存與安全',
+    'storage-desc':'所有資料儲存於 Supabase（PostgreSQL 資料庫），位於 ap-southeast-1 區域。我們採用行列安全政策（RLS）保護資料，未審核的回報不對外公開。',
+    'third-party-title':'第三方服務',
+    'third-party-list':'<li>Google OAuth：用於帳號登入驗證</li><li>Google Places API：用於場館地點搜尋</li><li>OpenStreetMap / CartoDB：用於地圖底圖顯示</li><li>Groq AI：用於回報內容初步審核</li>',
+    'rights-title':'您的權利',
+    'rights-desc':'您可以隨時透過聯絡管理員要求刪除您的回報資料或帳號資訊。',
+    'terms-title':'二、服務條款',
+    'service-title':'服務說明',
+    'service-desc':'救生員避雷地圖是一個供救生員分享游泳場館工作條件的平台，所有回報均為使用者自主提交，本站不保證資訊的完整性或即時性。',
+    'user-title':'使用者責任',
+    'user-list':'<li>回報內容須為真實的工作經驗，不得惡意造假或蓄意誹謗</li><li>不得提交廣告、垃圾訊息或與救生員工作無關的內容</li><li>每個帳號對每個場館只能提交一次回報</li><li>如需修改回報，請聯絡管理員</li>',
+    'review-title':'內容審核',
+    'review-desc':'所有回報提交後會先經過 AI 初步審核，再由管理員人工確認。不符合規定的回報將被拒絕或下架，管理員保有最終決定權。',
+    'disclaimer-title':'免責聲明',
+    'disclaimer-desc':'本站提供的資訊僅供參考，所有回報內容為使用者個人意見，不代表本站立場。使用者應自行判斷資訊的適用性，本站對因使用本站資訊而產生的任何損失不負責任。',
+    'change-title':'服務變更',
+    'change-desc':'本站保留隨時修改或終止服務的權利，條款如有變更將於本頁面更新。',
+    'contact-bar-text':'如有任何問題或需要刪除資料，請聯絡管理員',
+    'contact-bar-btn':'聯絡管理員',
+    'footer-text':'© 2026 救生員避雷地圖 LIFEGUARD RADAR',
+    'login-title':'登入後才能聯絡管理員',
+    'login-desc':'請先使用 Google 帳號登入，才能送出訊息給管理員。',
+    'google-login-btn':'使用 Google 帳號登入',
     'contact-title':'聯絡管理員',
-    'contact-reason-label':'聯絡原因',
-    'contact-r1':'修改回報內容','contact-r2':'刪除我的回報',
-    'contact-r3':'回報資訊有誤','contact-r4':'其他問題',
-    'contact-msg-label':'說明內容',
-    'contact-msg-placeholder':'請描述你的問題或修改需求...',
+    'reason-label':'聯絡原因',
+    'cr1':'修改回報內容','cr2':'刪除我的回報','cr3':'回報資訊有誤','cr4':'其他問題',
+    'msg-label':'說明內容',
     'contact-submit':'送出',
-    'map-pick-bar':'📍 點選地圖上的場館位置',
-    'map-pick-cancel':'取消',
-    'popup-pay':'💰 給薪：','popup-chores':'🧹 雜事：','popup-alone':'👤 獨立當班：',
-    'popup-mod':'若需修改，請','popup-mod-link':'聯絡管理員',
-    'popup-reports':'筆回報','popup-avg':'平均',
-    'popup-nav-of':'/',
-    'rt1':'⚡ 超雷','rt2':'偏雷','rt3':'普通','rt4':'不錯','rt5':'🏊 超推',
-    'welcome':'👋 歡迎，','ac-searching':'🔍 搜尋中...','ac-notfound':'找不到符合地點，可嘗試簡化關鍵字，或點下方「地圖選點」',
-    'hint-ok':'✅ 已選取場館位置，確認無誤後繼續填寫',
-    'hint-warn':'⚠️ 你已回報過此場館，每個場館只能回報一次，若需修改請聯絡管理員',
-    'hint-locating':'🔍 正在取得座標...','hint-map-ok':'✅ 已標記地圖位置',
-    'toast-submitted':'✅ 回報已送出，待管理員審核後顯示於地圖！',
-    'toast-contact':'✅ 已送出，管理員會盡快處理！',
-    'toast-logout':'已登出','toast-map':'請點選地圖上的場館位置',
-    'err-venue':'請先選擇場館','err-pay':'請選擇給薪模式','err-salary':'請填寫薪資水準',
-    'err-chores':'請選擇雜事負擔情形','err-alone':'請選擇是否獨立當班','err-rating':'請選擇整體評分',
-    'err-contact-reason':'請選擇聯絡原因','err-contact-msg':'請填寫說明內容',
-    'report-by':'回報者：',
-    'privacy':'隱私權政策','contact-admin':'聯絡管理員',
+    'contact-msg-placeholder':'請描述你的問題或修改需求...',
+    'err-reason':'請選擇聯絡原因','err-msg':'請填寫說明內容',
+    'toast-sent':'✅ 已送出，管理員會盡快處理！',
   },
   en:{
     'logo-text':'LIFEGUARD RADAR',
-    'stat-label':'Reports',
-    'logout':'Sign Out',
-    'legend-title':'Rating',
-    'r1':'1 Terrible','r2':'2 Poor','r3':'3 OK','r4':'4 Good','r5':'5 Great',
-    'user-label-pre':'Sign in to Report','user-label-post':'Submit Report',
-    'login-title':'Sign in to Submit',
-    'login-desc':'Sign in to submit a report.<br>One report per venue per account.<br>Contact admin to make changes.',
-    'google-login':'Sign in with Google',
-    'report-title':'Venue Work Report',
-    'venue-label':'Venue Name or Address',
-    'venue-placeholder':'Search venue, e.g. Nangang Sports Center',
-    'map-pick-hint':'Can\'t find venue? Pick location on map →',
-    'map-pick-btn':'Open map picker',
-    'pay-label':'Pay Type',
-    'pay-hourly':'Hourly','pay-monthly':'Monthly Salary',
-    'salary-label':'Pay Rate',
-    'salary-placeholder':'e.g. NT$190/hr or NT$36,000/month',
-    'chores-label':'Extra Duties Required?',
-    'chore-none':'None','chore-clean':'Clean facility','chore-toilet':'Clean restrooms',
-    'chore-pump':'Pump room operation','chore-drug':'Chemical dosing','chore-counter':'Reception duties',
-    'chores-other-placeholder':'Other duties (optional)',
-    'alone-label':'Regularly work alone?',
-    'alone-yes':'Yes, often solo with full risk','alone-no':'No, staffing meets regulations',
-    'rating-label':'Overall Rating',
-    'rating-bad':'⚡ Terrible','rating-good':'🏊 Great','rating-mid':'OK',
-    'comment-label':'Comments or Recommendations',
-    'comment-placeholder':'Share your experience to help others!',
-    'anon-label':'Submit anonymously (hide your name)',
-    'submit-btn':'Review & Submit',
-    'confirm-title':'Confirm Submission?',
-    'confirm-pay':'Pay Type','confirm-salary':'Pay Rate',
-    'confirm-chores':'Extra Duties','confirm-alone':'Solo Shifts',
-    'confirm-notice':'⚠️ One report per venue per account<br>Contact admin to modify after submission<br>Reports require admin approval before appearing on map',
-    'btn-back':'← Go Back','btn-go':'Confirm Submit',
+    'back-btn':'← Back to Map',
+    'page-title':'Privacy Policy & Terms of Service',
+    'updated':'Last updated: May 2026',
+    'privacy-title':'I. Privacy Policy',
+    'collect-title':'Data We Collect',
+    'collect-desc':'When you sign in with Google, we collect:',
+    'collect-list':'<li>Your Google Account unique ID (User ID)</li><li>Display name (shown as reporter)</li><li>Email address (for account identification only, not publicly displayed)</li>',
+    'report-data-title':'Report Content',
+    'report-data-desc':'Reports you submit (venue name, pay, working conditions, comments, etc.) are stored in our database and displayed on the map after approval. If you choose anonymous submission, your name will not appear, but your account ID is still recorded to prevent duplicate reports.',
+    'usage-title':'How We Use Your Data',
+    'usage-list':'<li>Display on Lifeguard Radar map for other users</li><li>Prevent duplicate reports from the same account for the same venue</li><li>AI-assisted moderation of report content</li>',
+    'storage-title':'Data Storage & Security',
+    'storage-desc':'All data is stored in Supabase (PostgreSQL) in the ap-southeast-1 region. We use Row Level Security (RLS) to protect data; unreviewed reports are not publicly accessible.',
+    'third-party-title':'Third-Party Services',
+    'third-party-list':'<li>Google OAuth: Account authentication</li><li>Google Places API: Venue location search</li><li>OpenStreetMap / CartoDB: Map tile display</li><li>Groq AI: Preliminary report moderation</li>',
+    'rights-title':'Your Rights',
+    'rights-desc':'You may request deletion of your report data or account information at any time by contacting the admin.',
+    'terms-title':'II. Terms of Service',
+    'service-title':'Service Description',
+    'service-desc':'Lifeguard Radar is a platform for lifeguards to share swimming venue working conditions. All reports are user-submitted; we do not guarantee completeness or timeliness of information.',
+    'user-title':'User Responsibilities',
+    'user-list':'<li>Reports must be based on genuine work experience; fabrication or defamation is prohibited</li><li>Do not submit advertisements, spam, or content unrelated to lifeguard work</li><li>One report per venue per account</li><li>Contact admin to modify a submitted report</li>',
+    'review-title':'Content Moderation',
+    'review-desc':'All reports undergo AI moderation first, then human review by an admin. Non-compliant reports will be rejected or removed. The admin has final authority.',
+    'disclaimer-title':'Disclaimer',
+    'disclaimer-desc':'Information on this site is for reference only. All report content represents individual user opinions and does not reflect the site\'s stance. We are not responsible for any losses resulting from use of this information.',
+    'change-title':'Service Changes',
+    'change-desc':'We reserve the right to modify or terminate the service at any time. Changes to these terms will be reflected on this page.',
+    'contact-bar-text':'For questions or data deletion requests, please contact the admin.',
+    'contact-bar-btn':'Contact Admin',
+    'footer-text':'© 2026 LIFEGUARD RADAR',
+    'login-title':'Sign in to Contact Admin',
+    'login-desc':'Please sign in with your Google account to send a message to the admin.',
+    'google-login-btn':'Sign in with Google',
     'contact-title':'Contact Admin',
-    'contact-reason-label':'Reason',
-    'contact-r1':'Modify report content','contact-r2':'Delete my report',
-    'contact-r3':'Incorrect information','contact-r4':'Other',
-    'contact-msg-label':'Details',
-    'contact-msg-placeholder':'Describe your issue or request...',
+    'reason-label':'Reason',
+    'cr1':'Modify report content','cr2':'Delete my report','cr3':'Incorrect information','cr4':'Other',
+    'msg-label':'Details',
     'contact-submit':'Send',
-    'map-pick-bar':'📍 Click on the map to select venue location',
-    'map-pick-cancel':'Cancel',
-    'popup-pay':'💰 Pay:','popup-chores':'🧹 Duties:','popup-alone':'👤 Solo shifts:',
-    'popup-mod':'To modify,','popup-mod-link':'contact admin',
-    'popup-reports':'reports','popup-avg':'avg',
-    'popup-nav-of':'/',
-    'rt1':'⚡ Terrible','rt2':'Poor','rt3':'OK','rt4':'Good','rt5':'🏊 Great',
-    'welcome':'👋 Welcome, ','ac-searching':'🔍 Searching...','ac-notfound':'No results found. Try different keywords or use map picker.',
-    'hint-ok':'✅ Venue selected. Continue filling the form.',
-    'hint-warn':'⚠️ You\'ve already reported this venue. Contact admin to modify.',
-    'hint-locating':'🔍 Getting coordinates...','hint-map-ok':'✅ Location marked on map',
-    'toast-submitted':'✅ Report submitted! Pending admin approval.',
-    'toast-contact':'✅ Message sent! Admin will respond soon.',
-    'toast-logout':'Signed out','toast-map':'Click on the map to select venue location',
-    'err-venue':'Please select a venue','err-pay':'Please select pay type','err-salary':'Please enter pay rate',
-    'err-chores':'Please select extra duties','err-alone':'Please select solo shift status','err-rating':'Please select a rating',
-    'err-contact-reason':'Please select a reason','err-contact-msg':'Please enter details',
-    'report-by':'Reporter: ',
-    'privacy':'Privacy Policy','contact-admin':'Contact Admin',
+    'contact-msg-placeholder':'Describe your issue or request...',
+    'err-reason':'Please select a reason','err-msg':'Please enter details',
+    'toast-sent':'✅ Message sent! Admin will respond soon.',
   }
 };
 
@@ -554,551 +350,89 @@ function setLang(l){
   lang = l;
   localStorage.setItem('lang', l);
   document.documentElement.setAttribute('lang', l==='zh'?'zh-TW':'en');
-  document.title = l==='zh' ? '救生員避雷地圖 | Lifeguard Radar' : 'LIFEGUARD RADAR | 救生員避雷地圖';
+  document.title = l==='zh' ? '隱私權政策 | 救生員避雷地圖' : 'Privacy Policy | LIFEGUARD RADAR';
   ['zh','en'].forEach(x=>document.getElementById('btn-'+x).classList.toggle('active',x===l));
-  applyI18n();
-}
-
-function applyI18n(){
-  // data-i18n elements
-  document.querySelectorAll('[data-i18n]').forEach(el=>{
-    const k=el.getAttribute('data-i18n');
-    if(DICT[lang][k]) el.innerHTML=DICT[lang][k];
+  // update all elements with id
+  Object.keys(DICT.zh).forEach(key=>{
+    const el = document.getElementById(key);
+    if(!el) return;
+    if(el.tagName==='UL') el.innerHTML = t(key);
+    else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') el.placeholder = t(key);
+    else el.innerHTML = t(key);
   });
-  // dynamic elements
-  const ul=document.getElementById('user-label');
-  if(ul) ul.textContent = user ? t('user-label-post') : t('user-label-pre');
-  // 更新 attribution 連結文字
-  const ap=document.getElementById('attr-privacy');
-  const ac=document.getElementById('attr-contact');
-  if(ap) ap.textContent=t('privacy');
-  if(ac) ac.textContent=t('contact-admin');
-  const vi=document.getElementById('v-input');
-  if(vi) vi.placeholder=t('venue-placeholder');
-  const fs=document.getElementById('f-salary');
-  if(fs) fs.placeholder=t('salary-placeholder');
-  const fc=document.getElementById('f-comment');
-  if(fc) fc.placeholder=t('comment-placeholder');
-  const co=document.getElementById('f-chores-other');
-  if(co) co.placeholder=t('chores-other-placeholder');
-  const cm=document.getElementById('contact-msg');
-  if(cm) cm.placeholder=t('contact-msg-placeholder');
-}
-
-const T = {
-  get 1(){ return t('rt1'); }, get 2(){ return t('rt2'); },
-  get 3(){ return t('rt3'); }, get 4(){ return t('rt4'); }, get 5(){ return t('rt5'); }
-};
-
-/* ══ STATE ══ */
-let theme='light', tile=null, user=null;
-let selRating=0, selVenue=null;
-let acTimer=null, acResults=[];
-const venues  = new Map(); // placeId → {name,address,lat,lon,reports[]}
-const markers = new Map(); // placeId → L.Marker
-let popIdx=0;
-
-/* ══ MAP ══ */
-const TILES = {
-  dark:  'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-  light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-};
-const map = L.map('map',{center:[25.047,121.517],zoom:12,zoomControl:false});
-L.control.zoom({position:'bottomright'}).addTo(map);
-
-function applyTile(dark){
-  if(tile) map.removeLayer(tile);
-  tile = L.tileLayer(dark?TILES.dark:TILES.light,{
-    attribution:'© <a href="https://www.openstreetmap.org/copyright">OSM</a> © <a href="https://carto.com/">CARTO</a>',
-    subdomains:'abcd',maxZoom:19
-  }).addTo(map);
+  // placeholder for contact-msg
+  const cm = document.getElementById('contact-msg');
+  if(cm) cm.placeholder = t('contact-msg-placeholder');
 }
 
 function setTheme(t){
-  theme=t;
-  const dark=t==='dark';
-  document.documentElement.setAttribute('data-theme',dark?'dark':'light');
-  applyTile(dark);
-  ['light','dark'].forEach(x=>document.getElementById('btn-'+x).classList.toggle('active',x===t));
+  document.body.setAttribute('data-theme', t);
+  ['light','dark'].forEach(x=>{ const el=document.getElementById('btn-'+x); if(el) el.classList.toggle('active',x===t); });
+  localStorage.setItem('theme', t);
 }
 
-/* ══ ICON ══ */
-function avg(reps){ return reps.reduce((a,r)=>a+r.rating,0)/reps.length; }
-function avgClr(reps){ const a=Math.floor(avg(reps)); return C[Math.max(1,Math.min(5,a))]; }
-function mkIcon(reps){
-  const col=avgClr(reps);
-  const lbl=reps.length===1?String(reps[0].rating):avg(reps).toFixed(1);
-  const fs=lbl.length>2?8:11;
-  return L.divIcon({
-    html:`<svg xmlns="http://www.w3.org/2000/svg" width="46" height="56" viewBox="0 0 46 56">
-      <filter id="gf"><feGaussianBlur stdDeviation="2" result="b"/>
-        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-      <path d="M23 2C12.5 2 4 10.5 4 21c0 14.5 19 33 19 33S42 35.5 42 21C42 10.5 33.5 2 23 2z"
-        fill="${col}" stroke="rgba(255,255,255,.22)" stroke-width="1.5" filter="url(#gf)"/>
-      <circle cx="23" cy="20" r="10" fill="rgba(0,0,0,.2)"/>
-      <text x="23" y="25" text-anchor="middle" fill="white"
-        font-size="${fs}" font-weight="900" font-family="'Noto Sans TC',sans-serif">${lbl}</text>
-    </svg>`,
-    className:'',iconSize:[46,56],iconAnchor:[23,56],popupAnchor:[0,-58]
-  });
-}
-
-/* ══ POPUP ══ */
-function popHTML(pid, idx){
-  const v=venues.get(pid), r=v.reports[idx], tot=v.reports.length;
-  const col=C[r.rating];
-  const chores=r.chores&&r.chores.length?r.chores.join('、'):'無';
-  const avgStr=tot>1?`<div class="popup-avg">共 ${tot} ${t('popup-reports')} · ${t('popup-avg')} <b>${avg(v.reports).toFixed(1)}</b> 分</div>`:'';
-  const navBar=`<div class="popup-nav">
-    <button class="nav-arr" ${idx===0?'disabled':''} onclick="event.stopPropagation();popNav('${pid}',-1)">‹</button>
-    <div class="nav-mid">第&nbsp;<input class="nav-in" type="number" min="1" max="${tot}" value="${idx+1}"
-      onchange="event.stopPropagation();popJump('${pid}',this.value)">&nbsp;筆
-      <span style="color:var(--text-muted)">/ ${tot}</span></div>
-    <button class="nav-arr" ${idx===tot-1?'disabled':''} onclick="event.stopPropagation();popNav('${pid}',1)">›</button>
-  </div>`;
-  return `<div class="popup-head">
-    <div class="popup-name">${v.name}</div>
-    <div class="popup-addr">📍 ${v.address}</div>
-    <div class="popup-badge" style="background:${col}20;color:${col};border:1px solid ${col}40">評分 ${r.rating}・${T[r.rating]}</div>
-    ${avgStr}</div>
-  ${tot>1?navBar:''}
-  <div class="popup-body">
-    <div class="popup-row">${t('popup-pay')}<span>${r.pay_type}、${r.salary}</span></div>
-    <div class="popup-row">${t('popup-chores')}<span>${chores}</span></div>
-    <div class="popup-row">${t('popup-alone')}<span>${r.alone}</span></div>
-    ${r.comment?`<div class="popup-comment">💬 ${r.comment}</div>`:''}
-    <div class="popup-mod">${t('popup-mod')} <a onclick="openContact('${pid}',${idx})">${t('popup-mod-link')}</a></div>
-  </div>`;
-}
-
-function openPopup(pid,idx){
-  popIdx=idx;
-  const mk=markers.get(pid);
-  if(!mk) return;
-  mk.setPopupContent(popHTML(pid,idx));
-  mk.openPopup();
-}
-function popNav(pid,dir){
-  const v=venues.get(pid);
-  popIdx=Math.max(0,Math.min(v.reports.length-1,popIdx+dir));
-  const mk=markers.get(pid);
-  mk.setPopupContent(popHTML(pid,popIdx));
-  mk.openPopup();
-}
-function popJump(pid,val){
-  const n=parseInt(val)-1; if(isNaN(n)) return;
-  const v=venues.get(pid);
-  popIdx=Math.max(0,Math.min(v.reports.length-1,n));
-  const mk=markers.get(pid);
-  mk.setPopupContent(popHTML(pid,popIdx));
-  mk.openPopup();
-}
-
-/* ══ ADD ROW TO MAP ══ */
-function addRowToMap(row){
-  const pid=row.place_id;
-  if(!venues.has(pid)){
-    venues.set(pid,{name:row.place_name,address:row.address,lat:row.lat,lon:row.lon,reports:[]});
-  }
-  const v=venues.get(pid);
-  // avoid duplicates on reload
-  if(!v.reports.find(r=>r.id===row.id)) v.reports.push(row);
-
-  if(markers.has(pid)){
-    markers.get(pid).setIcon(mkIcon(v.reports));
-  } else {
-    const mk=L.marker([v.lat,v.lon],{icon:mkIcon(v.reports)}).addTo(map);
-    mk.bindPopup('',{maxWidth:300});
-    mk.on('click',()=>openPopup(pid,0));
-    markers.set(pid,mk);
-  }
-  updateStats();
-}
-
-/* ══ LOAD APPROVED REPORTS ══ */
-async function loadReports(){
-  const {data,error}=await sb.from('reports').select('*').eq('status','approved');
-  if(error){ console.error('載入回報失敗',error); return; }
-  data.forEach(addRowToMap);
-}
-
-/* ══ AUTH ══ */
-function handleUserBtn(){
-  if(user) tryReport(); else openOv('ov-login');
-}
+/* ── AUTH ── */
+sb.auth.onAuthStateChange((event, session)=>{
+  user = session?.user ? { id: session.user.id, name: session.user.user_metadata?.full_name || session.user.email } : null;
+  if(user && event==='SIGNED_IN') closeOv('ov-login');
+});
 
 async function loginWithGoogle(){
-  const {error}=await sb.auth.signInWithOAuth({
-    provider:'google',
-    options:{ redirectTo: window.location.href }
-  });
-  if(error) showToast('登入失敗：'+error.message,'err');
+  await sb.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: window.location.href } });
 }
 
-// 監聽登入狀態（頁面載入 + OAuth redirect 回來都會觸發）
-sb.auth.onAuthStateChange((event, session)=>{
-  if(session?.user){
-    const u=session.user;
-    user = { id: u.id, name: u.user_metadata?.full_name || u.email };
-    document.getElementById('user-label').textContent=t('user-label-post');
-    document.getElementById('logout-btn').style.display='block';
-    closeOv('ov-login');
-    if(event==='SIGNED_IN' && !sessionStorage.getItem('welcomed')){
-      sessionStorage.setItem('welcomed','1');
-      showToast(t('welcome')+user.name+'！');
-    }
-  } else {
-    user=null;
-    sessionStorage.removeItem('welcomed');
-    document.getElementById('user-label').textContent=t('user-label-pre');
-    document.getElementById('logout-btn').style.display='none';
-  }
-});
-
-async function logout(){
-  await sb.auth.signOut();
-  showToast(t('toast-logout'));
-}
-
-/* ══ VENUE AUTOCOMPLETE ══ */
-function onVI(){
-  clearTimeout(acTimer);
-  const q=document.getElementById('v-input').value.trim();
-  const drop=document.getElementById('ac-drop');
-  if(q.length<2){ drop.classList.remove('open'); return; }
-  drop.innerHTML='<div class="ac-msg">'+t('ac-searching')+'</div>';
-  drop.classList.add('open');
-  acTimer=setTimeout(()=>fetchAC(q),500);
-}
-function onVF(){
-  const q=document.getElementById('v-input').value.trim();
-  if(q.length>=2) fetchAC(q);
-}
-async function fetchAC(q){
-  try{
-    // Google Places API (New) — Autocomplete，限制台灣地區
-    const res=await fetch('https://places.googleapis.com/v1/places:autocomplete',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','X-Goog-Api-Key':GOOGLE_KEY},
-      body:JSON.stringify({
-        input: q,
-        includedRegionCodes: ['tw'],
-        languageCode: 'zh-TW'
-      })
-    });
-    const data=await res.json();
-    acResults=data.suggestions||[];
-    renderAC();
-  }catch{ document.getElementById('ac-drop').classList.remove('open'); }
-}
-function renderAC(){
-  const drop=document.getElementById('ac-drop');
-  if(!acResults.length){
-    drop.innerHTML='<div class="ac-msg">'+t('ac-notfound')+'</div>'; return;
-  }
-  drop.innerHTML=acResults.map((s,i)=>{
-    const p=s.placePrediction;
-    const main=p.structuredFormat?.mainText?.text||p.text.text.split(',')[0];
-    const sub=p.structuredFormat?.secondaryText?.text||'';
-    return `<div class="ac-item" onclick="pickVenue(${i})">
-      <div class="ac-name">${main}</div>
-      ${sub?`<div class="ac-addr">${sub}</div>`:''}
-    </div>`;
-  }).join('');
-}
-async function pickVenue(i){
-  const p=acResults[i].placePrediction;
-  const placeId=p.placeId;
-  const main=p.structuredFormat?.mainText?.text||p.text.text.split(',')[0];
-  const sub=p.structuredFormat?.secondaryText?.text||p.text.text;
-
-  // 先鎖定顯示，再非同步查座標
-  document.getElementById('v-input').style.display='none';
-  document.getElementById('v-locked-name').textContent=main;
-  document.getElementById('v-locked-addr').textContent=sub;
-  document.getElementById('v-locked').style.display='flex';
-  document.getElementById('ac-drop').classList.remove('open');
-  document.getElementById('v-hint').textContent=t('hint-locating');
-  document.getElementById('v-hint').className='ac-hint';
-
-  try{
-    // 取得精確座標
-    const res=await fetch(
-      `https://places.googleapis.com/v1/places/${placeId}?fields=location,displayName,formattedAddress`,
-      {headers:{'X-Goog-Api-Key':GOOGLE_KEY,'X-Goog-FieldMask':'location,displayName,formattedAddress'}}
-    );
-    const d=await res.json();
-    selVenue={
-      placeId,
-      name:     d.displayName?.text||main,
-      address:  d.formattedAddress||sub,
-      lat:      d.location.latitude,
-      lon:      d.location.longitude
-    };
-    document.getElementById('v-locked-name').textContent=selVenue.name;
-    document.getElementById('v-locked-addr').textContent=selVenue.address;
-    checkDup();
-  }catch{
-    showToast('取得座標失敗，請重試','err');
-    clearVenue();
-  }
-}
-
-/* ══ MAP PICK MODE ══ */
-let mapPickMode=false;
-function startMapPick(){
-  closeOv('ov-report');
-  mapPickMode=true;
-  showToast(t('toast-map'));
-  map.getContainer().style.cursor='crosshair';
-  // 提示覆蓋層
-  document.getElementById('map-pick-hint').style.display='flex';
-}
-function cancelMapPick(){
-  mapPickMode=false;
-  map.getContainer().style.cursor='';
-  document.getElementById('map-pick-hint').style.display='none';
-  openOv('ov-report');
-}
-map.on('click',async function(e){
-  document.getElementById('ac-drop').classList.remove('open');
-  if(!mapPickMode) return;
-  mapPickMode=false;
-  map.getContainer().style.cursor='';
-  document.getElementById('map-pick-hint').style.display='none';
-
-  const {lat,lng}=e.latlng;
-  // 反查地址（reverse geocoding）
-  showToast('正在查詢位置資訊...');
-  try{
-    const r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&namedetails=1&accept-language=zh-TW`);
-    const d=await r.json();
-    const name=d.namedetails?.name||d.display_name.split(',')[0];
-    const parts=d.display_name.split(',').map(s=>s.trim()).filter(s=>s&&s!=='台灣'&&s!=='Taiwan');
-    const shortAddr=parts.slice(0,3).join('、');
-    selVenue={placeId:'custom_'+lat.toFixed(5)+'_'+lng.toFixed(5),name,address:shortAddr,lat,lon:lng};
-    document.getElementById('v-input').style.display='none';
-    document.getElementById('v-locked-name').textContent=name;
-    document.getElementById('v-locked-addr').textContent=shortAddr;
-    document.getElementById('v-locked').style.display='flex';
-    document.getElementById('v-hint').textContent=t('hint-map-ok');
-    document.getElementById('v-hint').className='ac-hint ok';
-  }catch{
-    showToast('查詢位置失敗，請重試','err');
-  }
-  openOv('ov-report');
-});
-function clearVenue(){
-  selVenue=null;
-  document.getElementById('v-input').style.display='';
-  document.getElementById('v-input').value='';
-  document.getElementById('v-locked').style.display='none';
-  document.getElementById('v-hint').textContent='';
-  document.getElementById('v-hint').className='ac-hint';
-  document.getElementById('submit-btn').disabled=false;
-  document.getElementById('ac-drop').classList.remove('open');
-}
-async function checkDup(){
-  if(!user||!selVenue) return;
-  const hint=document.getElementById('v-hint');
-  // 查詢此用戶是否已對此場館回報過
-  const {data}=await sb.from('reports')
-    .select('id').eq('user_id',user.id).eq('place_id',selVenue.placeId).limit(1);
-  if(data&&data.length>0){
-    hint.textContent=t('hint-warn');
-    hint.className='ac-hint warn';
-    document.getElementById('submit-btn').disabled=true;
-  } else {
-    hint.textContent=t('hint-ok');
-    hint.className='ac-hint ok';
-    document.getElementById('submit-btn').disabled=false;
-  }
-}
-
-/* ══ REPORT FLOW ══ */
-function tryReport(){
+/* ── CONTACT ── */
+function openContact(){
   if(!user){ openOv('ov-login'); return; }
-  document.getElementById('report-sub').textContent=t('report-by')+user.name;
-  openOv('ov-report');
-}
-function setRating(v){
-  selRating=v;
-  document.querySelectorAll('.rbtn').forEach(b=>b.classList.toggle('active',+b.dataset.v===v));
-}
-function openConfirm(){
-  if(!selVenue) return toast(t('err-venue'),'err');
-  const pay=document.querySelector('input[name="pay"]:checked')?.value;
-  const salary=document.getElementById('f-salary').value.trim();
-  const alone=document.querySelector('input[name="alone"]:checked')?.value;
-  const chores=[...document.querySelectorAll('input[name="chores"]:checked')].map(c=>c.value);
-  const co=document.getElementById('f-chores-other').value.trim();
-  if(co) chores.push(co);
-  const comment=document.getElementById('f-comment').value.trim();
-
-  if(!pay)          return toast(t('err-pay'),'err');
-  if(!salary)       return toast(t('err-salary'),'err');
-  if(!chores.length)return toast(t('err-chores'),'err');
-  if(!alone)        return toast(t('err-alone'),'err');
-  if(!selRating)    return toast(t('err-rating'),'err');
-
-  const col=C[selRating];
-  document.getElementById('c-name').textContent=selVenue.name;
-  document.getElementById('c-addr').textContent=selVenue.address;
-  const badge=document.getElementById('c-badge');
-  badge.textContent=`評分 ${selRating}・${T[selRating]}`;
-  badge.style.cssText=`background:${col}20;color:${col};border:1px solid ${col}40`;
-  document.getElementById('c-pay').textContent=pay;
-  document.getElementById('c-salary').textContent=salary;
-  document.getElementById('c-chores').textContent=chores.join('、');
-  document.getElementById('c-alone').textContent=alone;
-  const cc=document.getElementById('c-comment');
-  if(comment){cc.textContent='💬 '+comment;cc.style.display='';}else{cc.style.display='none';}
-
-  window._p={pay,salary,chores,alone,comment,anon:document.getElementById('f-anon').checked};
-  openOv('ov-confirm');
-}
-
-async function submitReport(){
-  const p=window._p;
-  if(!p||!selVenue||!user) return;
-
-  const goBtn=document.getElementById('confirm-go');
-  goBtn.disabled=true; goBtn.textContent='送出中...';
-
-  const {error}=await sb.from('reports').insert({
-    user_id:    user.id,
-    user_name:  p.anon ? '匿名' : user.name,
-    place_id:   selVenue.placeId,
-    place_name: selVenue.name,
-    address:    selVenue.address,
-    lat:        selVenue.lat,
-    lon:        selVenue.lon,
-    pay_type:   p.pay,
-    salary:     p.salary,
-    chores:     p.chores,
-    alone:      p.alone,
-    rating:     selRating,
-    comment:    p.comment,
-    status:     'pending'   // 需管理員審核才上架
-  });
-
-  goBtn.disabled=false; goBtn.textContent='確認送出';
-
-  if(error){
-    showToast('送出失敗：'+error.message,'err'); return;
-  }
-
-  closeOv('ov-confirm'); closeOv('ov-report');
-  showToast(t('toast-submitted'));
-  resetForm();
-}
-
-function resetForm(){
-  selRating=0; selVenue=null; window._p=null;
-  clearVenue();
-  ['f-salary','f-comment','f-chores-other'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('f-anon').checked=false;
-  document.querySelectorAll('input[name="pay"],input[name="alone"],input[name="chores"]')
-    .forEach(el=>el.checked=false);
-  document.querySelectorAll('.rbtn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('submit-btn').disabled=false;
-}
-
-function updateStats(){
-  let t=0; venues.forEach(v=>t+=v.reports.length);
-  document.getElementById('stat-total').textContent=t;
-}
-
-/* ══ CONTACT ══ */
-let contactPid=null, contactReportId=null;
-function openContact(pid, idx){
-  if(!user){ openOv('ov-login'); return; }
-  const v=pid?venues.get(pid):null;
-  const r=v?.reports[idx];
-  contactPid=pid;
-  contactReportId=r?.id||null;
   document.getElementById('contact-msg').value='';
   document.querySelectorAll('input[name="contact-type"]').forEach(el=>el.checked=false);
   openOv('ov-contact');
 }
+
 async function submitContact(){
-  const type=document.querySelector('input[name="contact-type"]:checked')?.value;
-  const msg=document.getElementById('contact-msg').value.trim();
-  if(!type) return toast(t('err-contact-reason'),'err');
-  if(!msg)  return toast(t('err-contact-msg'),'err');
+  const type = document.querySelector('input[name="contact-type"]:checked')?.value;
+  const msg = document.getElementById('contact-msg').value.trim();
+  if(!type) return showToast(t('err-reason'),'err');
+  if(!msg)  return showToast(t('err-msg'),'err');
 
-  const btn=document.getElementById('contact-submit');
-  btn.disabled=true; btn.textContent='送出中...';
+  const btn = document.getElementById('contact-submit');
+  btn.disabled=true; btn.textContent='...';
 
-  const v=venues.get(contactPid);
-  const {error}=await sb.from('contacts').insert({
-    user_id:    user.id,
-    user_name:  user.name,
-    place_name: v?.name||'',
-    report_id:  contactReportId,
-    message:    `【${type}】${msg}`,
-    status:     'unread'
+  const {error} = await sb.from('contacts').insert({
+    user_id: user.id, user_name: user.name,
+    place_name: '', report_id: null,
+    message: `【${type}】${msg}`, status: 'unread'
   });
 
-  btn.disabled=false; btn.textContent='送出';
-  if(error){ toast('送出失敗：'+error.message,'err'); return; }
+  btn.disabled=false; btn.textContent=t('contact-submit');
+  if(error){ showToast('Error: '+error.message,'err'); return; }
   closeOv('ov-contact');
-  showToast(t('toast-contact'));
+  showToast(t('toast-sent'));
 }
 
-/* ══ OVERLAY ══ */
 function openOv(id){ document.getElementById(id).classList.add('open'); }
 function closeOv(id){ document.getElementById(id).classList.remove('open'); }
-function ovClick(e,id){ if(e.target.id===id) closeOv(id); }
 
-/* ══ TOAST ══ */
-function showToast(msg,type=''){
+function showToast(msg, type=''){
   const el=document.getElementById('toast');
   el.textContent=msg; el.className='toast'+(type?' '+type:'');
   el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'),3200);
+  setTimeout(()=>el.classList.remove('show'), 3200);
 }
-function toast(msg,type){ showToast(msg,type); }
 
-/* ══ INIT ══ */
-// 語言：優先用 localStorage，其次偵測系統語言
+/* ── INIT ── */
+// 隱私政策頁一律淺色
+document.body.setAttribute('data-theme','light');
+
+// 語言跟隨系統，有 localStorage 紀錄就用紀錄的
 const savedLang = localStorage.getItem('lang');
-const sysLang = navigator.language || navigator.userLanguage || 'zh';
+const sysLang = navigator.language || 'zh';
 const initLang = savedLang || (sysLang.startsWith('en') ? 'en' : 'zh');
 setLang(initLang);
 
-setTheme('light');
-
-// OAuth redirect 回來時，網址 hash 裡有 token，讓 Supabase 處理後清掉
-if (window.location.hash && window.location.hash.includes('access_token')) {
-  sb.auth.getSession().then(() => {
-    // 清掉網址 hash，避免 token 外露
-    history.replaceState(null, '', window.location.pathname);
-  });
+if(window.location.hash && window.location.hash.includes('access_token')){
+  sb.auth.getSession().then(()=>{ history.replaceState(null,'',window.location.pathname); });
 }
-map.on('click',()=>document.getElementById('ac-drop').classList.remove('open'));
-
-function alignActionBtn(){
-  const zoom=document.querySelector('.leaflet-control-zoom');
-  const btn=document.getElementById('action-btn');
-  if(!zoom||!btn) return;
-  const zr=zoom.getBoundingClientRect(), br=btn.getBoundingClientRect();
-  btn.style.top=zr.top+(zr.height-br.height)/2+'px';
-  btn.style.bottom='auto';
-}
-map.whenReady(()=>{ setTimeout(alignActionBtn,100); });
-window.addEventListener('resize',alignActionBtn);
-
-// 載入已審核回報 + 等地圖 ready
-loadReports();
-
-// 把隱私權政策加到 Leaflet attribution 旁邊（用固定 id 方便切語言更新）
-map.whenReady(()=>{
-  setTimeout(()=>{
-    const attr = document.querySelector('.leaflet-control-attribution');
-    if(attr) attr.innerHTML += ` | <a href="/privacy" target="_blank" id="attr-privacy">${t('privacy')}</a> | <a onclick="openContact(null,null)" style="cursor:pointer;" id="attr-contact">${t('contact-admin')}</a>`;
-  }, 300);
-});
 </script>
 </body>
 </html>
