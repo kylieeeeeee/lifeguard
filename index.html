@@ -33,8 +33,7 @@ body{font-family:'Noto Sans TC','PingFang TC',sans-serif;background:var(--bg);co
   background:linear-gradient(180deg,var(--topbar) 0%,transparent 100%);
   padding:12px 14px 48px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;}
 .logo{pointer-events:all;display:flex;align-items:center;gap:10px;}
-.logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));
-  border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 20px var(--accent-glow);flex-shrink:0;}
+.logo-mark{font-size:28px;line-height:1;display:flex;align-items:center;}
 .logo-text{font-size:15px;font-weight:900;color:var(--text);letter-spacing:-.02em;}
 .logo-sub{font-size:9px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-top:2px;}
 .topbar-right{pointer-events:all;display:flex;align-items:center;gap:6px;flex-shrink:0;}
@@ -424,7 +423,7 @@ function setTheme(t){
 
 /* ══ ICON ══ */
 function avg(reps){ return reps.reduce((a,r)=>a+r.rating,0)/reps.length; }
-function avgClr(reps){ const a=avg(reps); return a<1.5?C[1]:a<2.5?C[2]:a<3.5?C[3]:a<4.5?C[4]:C[5]; }
+function avgClr(reps){ const a=Math.floor(avg(reps)); return C[Math.max(1,Math.min(5,a))]; }
 function mkIcon(reps){
   const col=avgClr(reps);
   const lbl=reps.length===1?String(reps[0].rating):avg(reps).toFixed(1);
@@ -450,11 +449,11 @@ function popHTML(pid, idx){
   const chores=r.chores&&r.chores.length?r.chores.join('、'):'無';
   const avgStr=tot>1?`<div class="popup-avg">共 ${tot} 筆 · 平均 <b>${avg(v.reports).toFixed(1)}</b> 分</div>`:'';
   const navBar=`<div class="popup-nav">
-    <button class="nav-arr" ${idx===0?'disabled':''} onclick="popNav('${pid}',-1)">‹</button>
+    <button class="nav-arr" ${idx===0?'disabled':''} onclick="event.stopPropagation();popNav('${pid}',-1)">‹</button>
     <div class="nav-mid">第&nbsp;<input class="nav-in" type="number" min="1" max="${tot}" value="${idx+1}"
-      onchange="popJump('${pid}',this.value)">&nbsp;筆
+      onchange="event.stopPropagation();popJump('${pid}',this.value)">&nbsp;筆
       <span style="color:var(--text-muted)">/ ${tot}</span></div>
-    <button class="nav-arr" ${idx===tot-1?'disabled':''} onclick="popNav('${pid}',1)">›</button>
+    <button class="nav-arr" ${idx===tot-1?'disabled':''} onclick="event.stopPropagation();popNav('${pid}',1)">›</button>
   </div>`;
   return `<div class="popup-head">
     <div class="popup-name">${v.name}</div>
@@ -481,13 +480,17 @@ function openPopup(pid,idx){
 function popNav(pid,dir){
   const v=venues.get(pid);
   popIdx=Math.max(0,Math.min(v.reports.length-1,popIdx+dir));
-  markers.get(pid).setPopupContent(popHTML(pid,popIdx));
+  const mk=markers.get(pid);
+  mk.setPopupContent(popHTML(pid,popIdx));
+  mk.openPopup();
 }
 function popJump(pid,val){
   const n=parseInt(val)-1; if(isNaN(n)) return;
   const v=venues.get(pid);
   popIdx=Math.max(0,Math.min(v.reports.length-1,n));
-  markers.get(pid).setPopupContent(popHTML(pid,popIdx));
+  const mk=markers.get(pid);
+  mk.setPopupContent(popHTML(pid,popIdx));
+  mk.openPopup();
 }
 
 /* ══ ADD ROW TO MAP ══ */
