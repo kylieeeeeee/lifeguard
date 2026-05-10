@@ -33,12 +33,11 @@ body{font-family:'Noto Sans TC','PingFang TC',sans-serif;background:var(--bg);co
   background:linear-gradient(180deg,var(--topbar) 0%,transparent 100%);
   padding:12px 14px 48px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;}
 .logo{pointer-events:all;display:flex;align-items:center;gap:10px;}
-.logo-mark{font-size:28px;line-height:1;display:flex;align-items:flex-start;padding-top:1px;}
+.logo-mark{font-size:28px;line-height:1;display:flex;align-items:center;}
 .logo-text{font-size:17px;font-weight:900;color:var(--text);letter-spacing:-.02em;}
-.logo-sub{font-size:10px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-top:2px;}
 .topbar-right{pointer-events:all;display:flex;align-items:center;gap:6px;flex-shrink:0;}
-.theme-toggle{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
-.tbtn{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:6px 8px;font-size:12px;transition:all .15s;}
+.theme-toggle{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;height:32px;}
+.tbtn{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:0 10px;font-size:13px;transition:all .15s;height:100%;}
 .tbtn.active{background:var(--accent);color:#fff;}
 .stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 14px;text-align:center;}
 .stat-num{font-size:20px;font-weight:900;color:var(--accent);line-height:1;}
@@ -191,8 +190,7 @@ textarea.finput{resize:vertical;min-height:75px;}
   <div class="logo">
     <div class="logo-mark">🛟</div>
     <div>
-      <div class="logo-text">救生員避雷地圖</div>
-      <div class="logo-sub">Lifeguard Radar</div>
+      <div class="logo-text" data-i18n="logo-text">救生員避雷地圖</div>
     </div>
   </div>
   <div class="topbar-right">
@@ -200,21 +198,25 @@ textarea.finput{resize:vertical;min-height:75px;}
       <button class="tbtn" id="btn-light" onclick="setTheme('light')" title="淺色">☀️</button>
       <button class="tbtn" id="btn-dark"  onclick="setTheme('dark')"  title="深色">🌙</button>
     </div>
+    <div class="theme-toggle">
+      <button class="tbtn" id="btn-zh" onclick="setLang('zh')">中</button>
+      <button class="tbtn" id="btn-en" onclick="setLang('en')">EN</button>
+    </div>
     <div class="stat-card">
       <div class="stat-num" id="stat-total">0</div>
-      <div class="stat-label">總回報數</div>
+      <div class="stat-label" data-i18n="stat-label">總回報數</div>
     </div>
-    <button class="logout-btn" id="logout-btn" onclick="logout()">登出</button>
+    <button class="logout-btn" id="logout-btn" onclick="logout()" data-i18n="logout">登出</button>
   </div>
 </div>
 
 <div class="legend">
-  <div class="legend-title">避雷評分</div>
-  <div class="legend-item"><div class="ldot" style="background:#dc2626"></div>1 超雷</div>
-  <div class="legend-item"><div class="ldot" style="background:#ea580c"></div>2 偏雷</div>
-  <div class="legend-item"><div class="ldot" style="background:#ca8a04"></div>3 普通</div>
-  <div class="legend-item"><div class="ldot" style="background:#16a34a"></div>4 不錯</div>
-  <div class="legend-item"><div class="ldot" style="background:#06b6d4"></div>5 超推</div>
+  <div class="legend-title" data-i18n="legend-title">避雷評分</div>
+  <div class="legend-item"><div class="ldot" style="background:#dc2626"></div><span data-i18n="r1">1 超雷</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#ea580c"></div><span data-i18n="r2">2 偏雷</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#ca8a04"></div><span data-i18n="r3">3 普通</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#16a34a"></div><span data-i18n="r4">4 不錯</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#06b6d4"></div><span data-i18n="r5">5 超推</span></div>
 </div>
 
 <button class="action-btn" id="action-btn" onclick="handleUserBtn()">
@@ -225,11 +227,11 @@ textarea.finput{resize:vertical;min-height:75px;}
 <div class="overlay" id="ov-login" onclick="ovClick(event,'ov-login')">
   <div class="modal login-modal">
     <div class="modal-head">
-      <div><div class="modal-title">登入後才能回報</div></div>
+      <div><div class="modal-title" data-i18n="login-title">登入後才能回報</div></div>
       <button class="close" onclick="closeOv('ov-login')">✕</button>
     </div>
     <div class="login-logo"><span class="big-emoji">🛟</span></div>
-    <div class="login-desc">
+    <div class="login-desc" data-i18n="login-desc">
       登入後才能提交回報。<br>每個帳號每個場館只能回報一次。<br>若需修改請聯絡管理員。
     </div>
     <button class="google-btn" onclick="loginWithGoogle()">
@@ -239,7 +241,7 @@ textarea.finput{resize:vertical;min-height:75px;}
         <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.3 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8H6.3C9.6 35.7 16.3 44 24 44z"/>
         <path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l6.2 5.2C40.8 36.1 44 30.5 44 24c0-1.3-.1-2.6-.4-3.9z"/>
       </svg>
-      使用 Google 帳號登入
+      <span data-i18n="google-login">使用 Google 帳號登入</span>
     </button>
   </div>
 </div>
@@ -249,13 +251,13 @@ textarea.finput{resize:vertical;min-height:75px;}
   <div class="modal">
     <div class="modal-head">
       <div>
-        <div class="modal-title">場館工作內容回報</div>
+        <div class="modal-title" data-i18n="report-title">場館工作內容回報</div>
         <div class="modal-subtitle" id="report-sub">救生員避雷地圖</div>
       </div>
       <button class="close" onclick="closeOv('ov-report')">✕</button>
     </div>
     <div class="fg">
-      <label class="flabel">場館名稱或地址<span class="req">*</span></label>
+      <label class="flabel"><span data-i18n="venue-label">場館名稱或地址</span><span class="req">*</span></label>
       <div class="venue-wrap">
         <div id="v-locked" style="display:none" class="ac-locked">
           <div class="ac-locked-info">
@@ -271,47 +273,47 @@ textarea.finput{resize:vertical;min-height:75px;}
       </div>
       <div class="ac-hint" id="v-hint"></div>
       <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">
-        找不到場館？可直接在地圖上點選位置 →
+        <span data-i18n="map-pick-hint">找不到場館？可直接在地圖上點選位置 →</span>
         <button onclick="startMapPick()" style="background:none;border:none;color:var(--accent);
-          cursor:pointer;font-size:11px;font-weight:700;padding:0;font-family:inherit;">點這裡開啟地圖選點</button>
+          cursor:pointer;font-size:11px;font-weight:700;padding:0;font-family:inherit;" data-i18n="map-pick-btn">點這裡開啟地圖選點</button>
       </div>
     </div>
     <div class="fdivider"></div>
     <div class="fg">
-      <label class="flabel">給薪模式<span class="req">*</span></label>
+      <label class="flabel"><span data-i18n="pay-label">給薪模式</span><span class="req">*</span></label>
       <div class="choice-group">
-        <label class="choice"><input type="radio" name="pay" value="時薪制"> 時薪制</label>
-        <label class="choice"><input type="radio" name="pay" value="月薪制"> 月薪制</label>
+        <label class="choice"><input type="radio" name="pay" value="時薪制"> <span data-i18n="pay-hourly">時薪制</span></label>
+        <label class="choice"><input type="radio" name="pay" value="月薪制"> <span data-i18n="pay-monthly">月薪制</span></label>
       </div>
     </div>
     <div class="fg">
-      <label class="flabel">薪資水準<span class="req">*</span></label>
+      <label class="flabel"><span data-i18n="salary-label">薪資水準</span><span class="req">*</span></label>
       <input id="f-salary" class="finput" type="text" placeholder="例：時薪 190，或月薪 36,000">
     </div>
     <div class="fdivider"></div>
     <div class="fg">
-      <label class="flabel">是否需要負擔雜事<span class="req">*</span></label>
+      <label class="flabel"><span data-i18n="chores-label">是否需要負擔雜事</span><span class="req">*</span></label>
       <div class="choice-group">
-        <label class="choice"><input type="checkbox" name="chores" value="無"> 無</label>
-        <label class="choice"><input type="checkbox" name="chores" value="清潔場地"> 清潔場地</label>
-        <label class="choice"><input type="checkbox" name="chores" value="清潔廁所"> 清潔廁所</label>
-        <label class="choice"><input type="checkbox" name="chores" value="機房操作"> 機房操作</label>
-        <label class="choice"><input type="checkbox" name="chores" value="加藥"> 加藥</label>
-        <label class="choice"><input type="checkbox" name="chores" value="兼任櫃台"> 兼任櫃台</label>
+        <label class="choice"><input type="checkbox" name="chores" value="無"> <span data-i18n="chore-none">無</span></label>
+        <label class="choice"><input type="checkbox" name="chores" value="清潔場地"> <span data-i18n="chore-clean">清潔場地</span></label>
+        <label class="choice"><input type="checkbox" name="chores" value="清潔廁所"> <span data-i18n="chore-toilet">清潔廁所</span></label>
+        <label class="choice"><input type="checkbox" name="chores" value="機房操作"> <span data-i18n="chore-pump">機房操作</span></label>
+        <label class="choice"><input type="checkbox" name="chores" value="加藥"> <span data-i18n="chore-drug">加藥</span></label>
+        <label class="choice"><input type="checkbox" name="chores" value="兼任櫃台"> <span data-i18n="chore-counter">兼任櫃台</span></label>
       </div>
       <input id="f-chores-other" class="finput" style="margin-top:7px" type="text" placeholder="其他雜事（選填）">
     </div>
     <div class="fg">
-      <label class="flabel">是否常態性獨立當班<span class="req">*</span></label>
+      <label class="flabel"><span data-i18n="alone-label">是否常態性獨立當班</span><span class="req">*</span></label>
       <div class="choice-group">
-        <label class="choice"><input type="radio" name="alone" value="是，常需獨自承擔風險"> 是，常需獨自承擔風險</label>
-        <label class="choice"><input type="radio" name="alone" value="否，人力符合規定"> 否，人力符合規定</label>
+        <label class="choice"><input type="radio" name="alone" value="是，常需獨自承擔風險"> <span data-i18n="alone-yes">是，常需獨自承擔風險</span></label>
+        <label class="choice"><input type="radio" name="alone" value="否，人力符合規定"> <span data-i18n="alone-no">否，人力符合規定</span></label>
       </div>
     </div>
     <div class="fdivider"></div>
     <div class="fg">
-      <label class="flabel">整體避雷評分<span class="req">*</span></label>
-      <div class="rating-labels"><span>⚡ 超雷</span><span></span><span>普通</span><span></span><span>🏊 超推</span></div>
+      <label class="flabel"><span data-i18n="rating-label">整體避雷評分</span><span class="req">*</span></label>
+      <div class="rating-labels"><span data-i18n="rating-bad">⚡ 超雷</span><span></span><span data-i18n="rating-mid">普通</span><span></span><span data-i18n="rating-good">🏊 超推</span></div>
       <div class="rating-row">
         <button class="rbtn" data-v="1" onclick="setRating(1)">1</button>
         <button class="rbtn" data-v="2" onclick="setRating(2)">2</button>
@@ -321,13 +323,13 @@ textarea.finput{resize:vertical;min-height:75px;}
       </div>
     </div>
     <div class="fg">
-      <label class="flabel">血淚心得或推薦理由</label>
+      <label class="flabel" data-i18n="comment-label">血淚心得或推薦理由</label>
       <textarea id="f-comment" class="finput" placeholder="分享工作體驗，幫助同業避雷！"></textarea>
     </div>
     <label class="choice" style="margin-bottom:14px;">
-      <input type="checkbox" id="f-anon"> 匿名提交（不顯示你的名稱）
+      <input type="checkbox" id="f-anon"> <span data-i18n="anon-label">匿名提交（不顯示你的名稱）</span>
     </label>
-    <button class="submit" id="submit-btn" onclick="openConfirm()">確認送出</button>
+    <button class="submit" id="submit-btn" onclick="openConfirm()" data-i18n="submit-btn">確認送出</button>
   </div>
 </div>
 
@@ -336,7 +338,7 @@ textarea.finput{resize:vertical;min-height:75px;}
   <div class="modal confirm-modal">
     <div class="modal-head">
       <div>
-        <div class="modal-title">確認送出回報？</div>
+        <div class="modal-title" data-i18n="confirm-title">確認送出回報？</div>
       </div>
       <button class="close" onclick="closeOv('ov-confirm')">✕</button>
     </div>
@@ -344,16 +346,16 @@ textarea.finput{resize:vertical;min-height:75px;}
       <div class="c-venue" id="c-name"></div>
       <div class="c-addr"  id="c-addr"></div>
       <div class="c-badge" id="c-badge"></div>
-      <div class="c-row">給薪模式 <span id="c-pay"></span></div>
-      <div class="c-row">薪資水準 <span id="c-salary"></span></div>
-      <div class="c-row">雜事負擔 <span id="c-chores"></span></div>
-      <div class="c-row">獨立當班 <span id="c-alone"></span></div>
+      <div class="c-row"><span data-i18n="confirm-pay">給薪模式</span> <span id="c-pay"></span></div>
+      <div class="c-row"><span data-i18n="confirm-salary">薪資水準</span> <span id="c-salary"></span></div>
+      <div class="c-row"><span data-i18n="confirm-chores">雜事負擔</span> <span id="c-chores"></span></div>
+      <div class="c-row"><span data-i18n="confirm-alone">獨立當班</span> <span id="c-alone"></span></div>
       <div class="c-comment" id="c-comment" style="display:none"></div>
     </div>
-    <div class="confirm-notice">⚠️ 每個場館只能回報一次<br>送出後若需修改請聯絡管理員<br>送出後需待管理員審核才會顯示於地圖</div>
+    <div class="confirm-notice" data-i18n="confirm-notice">⚠️ 每個場館只能回報一次<br>送出後若需修改請聯絡管理員<br>送出後需待管理員審核才會顯示於地圖</div>
     <div class="confirm-btns">
-      <button class="btn-back" onclick="closeOv('ov-confirm')">← 返回修改</button>
-      <button class="btn-go" id="confirm-go" onclick="submitReport()">確認送出</button>
+      <button class="btn-back" onclick="closeOv('ov-confirm')" data-i18n="btn-back">← 返回修改</button>
+      <button class="btn-go" id="confirm-go" onclick="submitReport()" data-i18n="btn-go">確認送出</button>
     </div>
   </div>
 </div>
@@ -363,24 +365,24 @@ textarea.finput{resize:vertical;min-height:75px;}
   <div class="modal contact-modal">
     <div class="modal-head">
       <div>
-        <div class="modal-title">聯絡管理員</div>
+        <div class="modal-title" data-i18n="contact-title">聯絡管理員</div>
       </div>
       <button class="close" onclick="closeOv('ov-contact')">✕</button>
     </div>
     <div class="fg">
-      <label class="flabel">聯絡原因<span class="req">*</span></label>
+      <label class="flabel"><span data-i18n="contact-reason-label">聯絡原因</span><span class="req">*</span></label>
       <div class="choice-group">
-        <label class="choice"><input type="radio" name="contact-type" value="修改回報內容"> 修改回報內容</label>
-        <label class="choice"><input type="radio" name="contact-type" value="刪除我的回報"> 刪除我的回報</label>
-        <label class="choice"><input type="radio" name="contact-type" value="回報資訊有誤"> 回報資訊有誤</label>
-        <label class="choice"><input type="radio" name="contact-type" value="其他問題"> 其他問題</label>
+        <label class="choice"><input type="radio" name="contact-type" value="修改回報內容"> <span data-i18n="contact-r1">修改回報內容</span></label>
+        <label class="choice"><input type="radio" name="contact-type" value="刪除我的回報"> <span data-i18n="contact-r2">刪除我的回報</span></label>
+        <label class="choice"><input type="radio" name="contact-type" value="回報資訊有誤"> <span data-i18n="contact-r3">回報資訊有誤</span></label>
+        <label class="choice"><input type="radio" name="contact-type" value="其他問題"> <span data-i18n="contact-r4">其他問題</span></label>
       </div>
     </div>
     <div class="fg">
-      <label class="flabel">說明內容<span class="req">*</span></label>
+      <label class="flabel"><span data-i18n="contact-msg-label">說明內容</span><span class="req">*</span></label>
       <textarea id="contact-msg" class="finput" placeholder="請描述你的問題或修改需求..." style="min-height:100px;"></textarea>
     </div>
-    <button class="submit" id="contact-submit" onclick="submitContact()">送出</button>
+    <button class="submit" id="contact-submit" onclick="submitContact()" data-i18n="contact-submit">送出</button>
   </div>
 </div>
 
@@ -390,9 +392,9 @@ textarea.finput{resize:vertical;min-height:75px;}
 <div id="map-pick-hint" style="display:none;position:fixed;top:0;left:0;right:0;z-index:1500;
   background:rgba(8,145,178,.92);color:#fff;padding:14px 20px;
   align-items:center;justify-content:space-between;font-size:14px;font-weight:700;">
-  <span>📍 點選地圖上的場館位置</span>
+  <span data-i18n="map-pick-bar">📍 點選地圖上的場館位置</span>
   <button onclick="cancelMapPick()" style="background:rgba(255,255,255,.2);border:none;border-radius:8px;
-    color:#fff;padding:6px 14px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;">取消</button>
+    color:#fff;padding:6px 14px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;" data-i18n="map-pick-cancel">取消</button>
 </div>
 
 <script>
@@ -414,7 +416,174 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
 
 /* ══ CONSTANTS ══ */
 const C = {1:'#dc2626',2:'#ea580c',3:'#ca8a04',4:'#16a34a',5:'#06b6d4'};
-const T = {1:'⚡ 超雷',2:'偏雷',3:'普通',4:'不錯',5:'🏊 超推'};
+
+/* ══ I18N ══ */
+let lang = 'zh';
+const DICT = {
+  zh:{
+    'logo-text':'救生員避雷地圖',
+    'stat-label':'總回報數',
+    'logout':'登出',
+    'legend-title':'避雷評分',
+    'r1':'1 超雷','r2':'2 偏雷','r3':'3 普通','r4':'4 不錯','r5':'5 超推',
+    'user-label-pre':'登入後回報','user-label-post':'立即回報',
+    'login-title':'登入後才能回報',
+    'login-desc':'登入後才能提交回報。<br>每個帳號每個場館只能回報一次。<br>若需修改請聯絡管理員。',
+    'google-login':'使用 Google 帳號登入',
+    'report-title':'場館工作內容回報',
+    'venue-label':'場館名稱或地址',
+    'venue-placeholder':'搜尋場館名稱，例：南港運動中心',
+    'map-pick-hint':'找不到場館？可直接在地圖上點選位置 →',
+    'map-pick-btn':'點這裡開啟地圖選點',
+    'pay-label':'給薪模式',
+    'pay-hourly':'時薪制','pay-monthly':'月薪制',
+    'salary-label':'薪資水準',
+    'salary-placeholder':'例：時薪 190，或月薪 36,000',
+    'chores-label':'是否需要負擔雜事',
+    'chore-none':'無','chore-clean':'清潔場地','chore-toilet':'清潔廁所',
+    'chore-pump':'機房操作','chore-drug':'加藥','chore-counter':'兼任櫃台',
+    'chores-other-placeholder':'其他雜事（選填）',
+    'alone-label':'是否常態性獨立當班',
+    'alone-yes':'是，常需獨自承擔風險','alone-no':'否，人力符合規定',
+    'rating-label':'整體避雷評分',
+    'rating-bad':'⚡ 超雷','rating-good':'🏊 超推','rating-mid':'普通',
+    'comment-label':'血淚心得或推薦理由',
+    'comment-placeholder':'分享工作體驗，幫助同業避雷！',
+    'anon-label':'匿名提交（不顯示你的名稱）',
+    'submit-btn':'確認送出',
+    'confirm-title':'確認送出回報？',
+    'confirm-pay':'給薪模式','confirm-salary':'薪資水準',
+    'confirm-chores':'雜事負擔','confirm-alone':'獨立當班',
+    'confirm-notice':'⚠️ 每個場館只能回報一次<br>送出後若需修改請聯絡管理員<br>送出後需待管理員審核才會顯示於地圖',
+    'btn-back':'← 返回修改','btn-go':'確認送出',
+    'contact-title':'聯絡管理員',
+    'contact-reason-label':'聯絡原因',
+    'contact-r1':'修改回報內容','contact-r2':'刪除我的回報',
+    'contact-r3':'回報資訊有誤','contact-r4':'其他問題',
+    'contact-msg-label':'說明內容',
+    'contact-msg-placeholder':'請描述你的問題或修改需求...',
+    'contact-submit':'送出',
+    'map-pick-bar':'📍 點選地圖上的場館位置',
+    'map-pick-cancel':'取消',
+    'popup-pay':'💰 給薪：','popup-chores':'🧹 雜事：','popup-alone':'👤 獨立當班：',
+    'popup-mod':'若需修改，請','popup-mod-link':'聯絡管理員',
+    'popup-reports':'筆回報','popup-avg':'平均',
+    'popup-nav-of':'/',
+    'rt1':'⚡ 超雷','rt2':'偏雷','rt3':'普通','rt4':'不錯','rt5':'🏊 超推',
+    'welcome':'👋 歡迎，','ac-searching':'🔍 搜尋中...','ac-notfound':'找不到符合地點，可嘗試簡化關鍵字，或點下方「地圖選點」',
+    'hint-ok':'✅ 已選取場館位置，確認無誤後繼續填寫',
+    'hint-warn':'⚠️ 你已回報過此場館，每個場館只能回報一次，若需修改請聯絡管理員',
+    'hint-locating':'🔍 正在取得座標...','hint-map-ok':'✅ 已標記地圖位置',
+    'toast-submitted':'✅ 回報已送出，待管理員審核後顯示於地圖！',
+    'toast-contact':'✅ 已送出，管理員會盡快處理！',
+    'toast-logout':'已登出','toast-map':'請點選地圖上的場館位置',
+    'err-venue':'請先選擇場館','err-pay':'請選擇給薪模式','err-salary':'請填寫薪資水準',
+    'err-chores':'請選擇雜事負擔情形','err-alone':'請選擇是否獨立當班','err-rating':'請選擇整體評分',
+    'err-contact-reason':'請選擇聯絡原因','err-contact-msg':'請填寫說明內容',
+    'report-by':'回報者：',
+    'privacy':'隱私權政策','contact-admin':'聯絡管理員',
+  },
+  en:{
+    'logo-text':'Lifeguard Radar',
+    'stat-label':'Reports',
+    'logout':'Sign Out',
+    'legend-title':'Rating',
+    'r1':'1 Terrible','r2':'2 Poor','r3':'3 OK','r4':'4 Good','r5':'5 Great',
+    'user-label-pre':'Sign in to Report','user-label-post':'Submit Report',
+    'login-title':'Sign in to Submit',
+    'login-desc':'Sign in to submit a report.<br>One report per venue per account.<br>Contact admin to make changes.',
+    'google-login':'Sign in with Google',
+    'report-title':'Venue Work Report',
+    'venue-label':'Venue Name or Address',
+    'venue-placeholder':'Search venue, e.g. Nangang Sports Center',
+    'map-pick-hint':'Can\'t find venue? Pick location on map →',
+    'map-pick-btn':'Open map picker',
+    'pay-label':'Pay Type',
+    'pay-hourly':'Hourly','pay-monthly':'Monthly Salary',
+    'salary-label':'Pay Rate',
+    'salary-placeholder':'e.g. NT$190/hr or NT$36,000/month',
+    'chores-label':'Extra Duties Required?',
+    'chore-none':'None','chore-clean':'Clean facility','chore-toilet':'Clean restrooms',
+    'chore-pump':'Pump room operation','chore-drug':'Chemical dosing','chore-counter':'Reception duties',
+    'chores-other-placeholder':'Other duties (optional)',
+    'alone-label':'Regularly work alone?',
+    'alone-yes':'Yes, often solo with full risk','alone-no':'No, staffing meets regulations',
+    'rating-label':'Overall Rating',
+    'rating-bad':'⚡ Terrible','rating-good':'🏊 Great','rating-mid':'OK',
+    'comment-label':'Comments or Recommendations',
+    'comment-placeholder':'Share your experience to help others!',
+    'anon-label':'Submit anonymously (hide your name)',
+    'submit-btn':'Review & Submit',
+    'confirm-title':'Confirm Submission?',
+    'confirm-pay':'Pay Type','confirm-salary':'Pay Rate',
+    'confirm-chores':'Extra Duties','confirm-alone':'Solo Shifts',
+    'confirm-notice':'⚠️ One report per venue per account<br>Contact admin to modify after submission<br>Reports require admin approval before appearing on map',
+    'btn-back':'← Go Back','btn-go':'Confirm Submit',
+    'contact-title':'Contact Admin',
+    'contact-reason-label':'Reason',
+    'contact-r1':'Modify report content','contact-r2':'Delete my report',
+    'contact-r3':'Incorrect information','contact-r4':'Other',
+    'contact-msg-label':'Details',
+    'contact-msg-placeholder':'Describe your issue or request...',
+    'contact-submit':'Send',
+    'map-pick-bar':'📍 Click on the map to select venue location',
+    'map-pick-cancel':'Cancel',
+    'popup-pay':'💰 Pay:','popup-chores':'🧹 Duties:','popup-alone':'👤 Solo shifts:',
+    'popup-mod':'To modify,','popup-mod-link':'contact admin',
+    'popup-reports':'reports','popup-avg':'avg',
+    'popup-nav-of':'/',
+    'rt1':'⚡ Terrible','rt2':'Poor','rt3':'OK','rt4':'Good','rt5':'🏊 Great',
+    'welcome':'👋 Welcome, ','ac-searching':'🔍 Searching...','ac-notfound':'No results found. Try different keywords or use map picker.',
+    'hint-ok':'✅ Venue selected. Continue filling the form.',
+    'hint-warn':'⚠️ You\'ve already reported this venue. Contact admin to modify.',
+    'hint-locating':'🔍 Getting coordinates...','hint-map-ok':'✅ Location marked on map',
+    'toast-submitted':'✅ Report submitted! Pending admin approval.',
+    'toast-contact':'✅ Message sent! Admin will respond soon.',
+    'toast-logout':'Signed out','toast-map':'Click on the map to select venue location',
+    'err-venue':'Please select a venue','err-pay':'Please select pay type','err-salary':'Please enter pay rate',
+    'err-chores':'Please select extra duties','err-alone':'Please select solo shift status','err-rating':'Please select a rating',
+    'err-contact-reason':'Please select a reason','err-contact-msg':'Please enter details',
+    'report-by':'Reporter: ',
+    'privacy':'Privacy Policy','contact-admin':'Contact Admin',
+  }
+};
+
+function t(key){ return DICT[lang][key] || DICT['zh'][key] || key; }
+
+function setLang(l){
+  lang = l;
+  localStorage.setItem('lang', l);
+  document.documentElement.setAttribute('lang', l==='zh'?'zh-TW':'en');
+  ['zh','en'].forEach(x=>document.getElementById('btn-'+x).classList.toggle('active',x===l));
+  applyI18n();
+}
+
+function applyI18n(){
+  // data-i18n elements
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n');
+    if(DICT[lang][k]) el.innerHTML=DICT[lang][k];
+  });
+  // dynamic elements
+  const ul=document.getElementById('user-label');
+  if(ul) ul.textContent = user ? t('user-label-post') : t('user-label-pre');
+  // placeholder updates
+  const vi=document.getElementById('v-input');
+  if(vi) vi.placeholder=t('venue-placeholder');
+  const fs=document.getElementById('f-salary');
+  if(fs) fs.placeholder=t('salary-placeholder');
+  const fc=document.getElementById('f-comment');
+  if(fc) fc.placeholder=t('comment-placeholder');
+  const co=document.getElementById('f-chores-other');
+  if(co) co.placeholder=t('chores-other-placeholder');
+  const cm=document.getElementById('contact-msg');
+  if(cm) cm.placeholder=t('contact-msg-placeholder');
+}
+
+const T = {
+  get 1(){ return t('rt1'); }, get 2(){ return t('rt2'); },
+  get 3(){ return t('rt3'); }, get 4(){ return t('rt4'); }, get 5(){ return t('rt5'); }
+};
 
 /* ══ STATE ══ */
 let theme='light', tile=null, user=null;
@@ -474,7 +643,7 @@ function popHTML(pid, idx){
   const v=venues.get(pid), r=v.reports[idx], tot=v.reports.length;
   const col=C[r.rating];
   const chores=r.chores&&r.chores.length?r.chores.join('、'):'無';
-  const avgStr=tot>1?`<div class="popup-avg">共 ${tot} 筆 · 平均 <b>${avg(v.reports).toFixed(1)}</b> 分</div>`:'';
+  const avgStr=tot>1?`<div class="popup-avg">共 ${tot} ${t('popup-reports')} · ${t('popup-avg')} <b>${avg(v.reports).toFixed(1)}</b> 分</div>`:'';
   const navBar=`<div class="popup-nav">
     <button class="nav-arr" ${idx===0?'disabled':''} onclick="event.stopPropagation();popNav('${pid}',-1)">‹</button>
     <div class="nav-mid">第&nbsp;<input class="nav-in" type="number" min="1" max="${tot}" value="${idx+1}"
@@ -489,11 +658,11 @@ function popHTML(pid, idx){
     ${avgStr}</div>
   ${tot>1?navBar:''}
   <div class="popup-body">
-    <div class="popup-row">💰 給薪：<span>${r.pay_type}、${r.salary}</span></div>
-    <div class="popup-row">🧹 雜事：<span>${chores}</span></div>
-    <div class="popup-row">👤 獨立當班：<span>${r.alone}</span></div>
+    <div class="popup-row">${t('popup-pay')}<span>${r.pay_type}、${r.salary}</span></div>
+    <div class="popup-row">${t('popup-chores')}<span>${chores}</span></div>
+    <div class="popup-row">${t('popup-alone')}<span>${r.alone}</span></div>
     ${r.comment?`<div class="popup-comment">💬 ${r.comment}</div>`:''}
-    <div class="popup-mod">若需修改，請 <a onclick="openContact('${pid}',${idx})">聯絡管理員</a></div>
+    <div class="popup-mod">${t('popup-mod')} <a onclick="openContact('${pid}',${idx})">${t('popup-mod-link')}</a></div>
   </div>`;
 }
 
@@ -566,25 +735,24 @@ sb.auth.onAuthStateChange((event, session)=>{
   if(session?.user){
     const u=session.user;
     user = { id: u.id, name: u.user_metadata?.full_name || u.email };
-    document.getElementById('user-label').textContent='立即回報';
+    document.getElementById('user-label').textContent=t('user-label-post');
     document.getElementById('logout-btn').style.display='block';
     closeOv('ov-login');
-    // 只在真正完成 OAuth 登入時才顯示歡迎（不在頁面重整時重複顯示）
     if(event==='SIGNED_IN' && !sessionStorage.getItem('welcomed')){
       sessionStorage.setItem('welcomed','1');
-      showToast('👋 歡迎，'+user.name+'！');
+      showToast(t('welcome')+user.name+'！');
     }
   } else {
     user=null;
     sessionStorage.removeItem('welcomed');
-    document.getElementById('user-label').textContent='登入後回報';
+    document.getElementById('user-label').textContent=t('user-label-pre');
     document.getElementById('logout-btn').style.display='none';
   }
 });
 
 async function logout(){
   await sb.auth.signOut();
-  showToast('已登出');
+  showToast(t('toast-logout'));
 }
 
 /* ══ VENUE AUTOCOMPLETE ══ */
@@ -593,7 +761,7 @@ function onVI(){
   const q=document.getElementById('v-input').value.trim();
   const drop=document.getElementById('ac-drop');
   if(q.length<2){ drop.classList.remove('open'); return; }
-  drop.innerHTML='<div class="ac-msg">🔍 搜尋中...</div>';
+  drop.innerHTML='<div class="ac-msg">'+t('ac-searching')+'</div>';
   drop.classList.add('open');
   acTimer=setTimeout(()=>fetchAC(q),500);
 }
@@ -621,7 +789,7 @@ async function fetchAC(q){
 function renderAC(){
   const drop=document.getElementById('ac-drop');
   if(!acResults.length){
-    drop.innerHTML='<div class="ac-msg">找不到符合地點，可嘗試簡化關鍵字，或點下方「地圖選點」</div>'; return;
+    drop.innerHTML='<div class="ac-msg">'+t('ac-notfound')+'</div>'; return;
   }
   drop.innerHTML=acResults.map((s,i)=>{
     const p=s.placePrediction;
@@ -645,7 +813,7 @@ async function pickVenue(i){
   document.getElementById('v-locked-addr').textContent=sub;
   document.getElementById('v-locked').style.display='flex';
   document.getElementById('ac-drop').classList.remove('open');
-  document.getElementById('v-hint').textContent='🔍 正在取得座標...';
+  document.getElementById('v-hint').textContent=t('hint-locating');
   document.getElementById('v-hint').className='ac-hint';
 
   try{
@@ -676,7 +844,7 @@ let mapPickMode=false;
 function startMapPick(){
   closeOv('ov-report');
   mapPickMode=true;
-  showToast('請點選地圖上的場館位置');
+  showToast(t('toast-map'));
   map.getContainer().style.cursor='crosshair';
   // 提示覆蓋層
   document.getElementById('map-pick-hint').style.display='flex';
@@ -708,7 +876,7 @@ map.on('click',async function(e){
     document.getElementById('v-locked-name').textContent=name;
     document.getElementById('v-locked-addr').textContent=shortAddr;
     document.getElementById('v-locked').style.display='flex';
-    document.getElementById('v-hint').textContent='✅ 已標記地圖位置';
+    document.getElementById('v-hint').textContent=t('hint-map-ok');
     document.getElementById('v-hint').className='ac-hint ok';
   }catch{
     showToast('查詢位置失敗，請重試','err');
@@ -732,11 +900,11 @@ async function checkDup(){
   const {data}=await sb.from('reports')
     .select('id').eq('user_id',user.id).eq('place_id',selVenue.placeId).limit(1);
   if(data&&data.length>0){
-    hint.textContent='⚠️ 你已回報過此場館，每個場館只能回報一次，若需修改請聯絡管理員';
+    hint.textContent=t('hint-warn');
     hint.className='ac-hint warn';
     document.getElementById('submit-btn').disabled=true;
   } else {
-    hint.textContent='✅ 已選取場館位置，確認無誤後繼續填寫';
+    hint.textContent=t('hint-ok');
     hint.className='ac-hint ok';
     document.getElementById('submit-btn').disabled=false;
   }
@@ -745,7 +913,7 @@ async function checkDup(){
 /* ══ REPORT FLOW ══ */
 function tryReport(){
   if(!user){ openOv('ov-login'); return; }
-  document.getElementById('report-sub').textContent='回報者：'+user.name;
+  document.getElementById('report-sub').textContent=t('report-by')+user.name;
   openOv('ov-report');
 }
 function setRating(v){
@@ -753,7 +921,7 @@ function setRating(v){
   document.querySelectorAll('.rbtn').forEach(b=>b.classList.toggle('active',+b.dataset.v===v));
 }
 function openConfirm(){
-  if(!selVenue) return toast('請先選擇場館','err');
+  if(!selVenue) return toast(t('err-venue'),'err');
   const pay=document.querySelector('input[name="pay"]:checked')?.value;
   const salary=document.getElementById('f-salary').value.trim();
   const alone=document.querySelector('input[name="alone"]:checked')?.value;
@@ -762,11 +930,11 @@ function openConfirm(){
   if(co) chores.push(co);
   const comment=document.getElementById('f-comment').value.trim();
 
-  if(!pay)          return toast('請選擇給薪模式','err');
-  if(!salary)       return toast('請填寫薪資水準','err');
-  if(!chores.length)return toast('請選擇雜事負擔情形','err');
-  if(!alone)        return toast('請選擇是否獨立當班','err');
-  if(!selRating)    return toast('請選擇整體評分','err');
+  if(!pay)          return toast(t('err-pay'),'err');
+  if(!salary)       return toast(t('err-salary'),'err');
+  if(!chores.length)return toast(t('err-chores'),'err');
+  if(!alone)        return toast(t('err-alone'),'err');
+  if(!selRating)    return toast(t('err-rating'),'err');
 
   const col=C[selRating];
   document.getElementById('c-name').textContent=selVenue.name;
@@ -816,7 +984,7 @@ async function submitReport(){
   }
 
   closeOv('ov-confirm'); closeOv('ov-report');
-  showToast('✅ 回報已送出，待管理員審核後顯示於地圖！');
+  showToast(t('toast-submitted'));
   resetForm();
 }
 
@@ -851,8 +1019,8 @@ function openContact(pid, idx){
 async function submitContact(){
   const type=document.querySelector('input[name="contact-type"]:checked')?.value;
   const msg=document.getElementById('contact-msg').value.trim();
-  if(!type) return toast('請選擇聯絡原因','err');
-  if(!msg)  return toast('請填寫說明內容','err');
+  if(!type) return toast(t('err-contact-reason'),'err');
+  if(!msg)  return toast(t('err-contact-msg'),'err');
 
   const btn=document.getElementById('contact-submit');
   btn.disabled=true; btn.textContent='送出中...';
@@ -870,7 +1038,7 @@ async function submitContact(){
   btn.disabled=false; btn.textContent='送出';
   if(error){ toast('送出失敗：'+error.message,'err'); return; }
   closeOv('ov-contact');
-  showToast('✅ 已送出，管理員會盡快處理！');
+  showToast(t('toast-contact'));
 }
 
 /* ══ OVERLAY ══ */
@@ -888,6 +1056,12 @@ function showToast(msg,type=''){
 function toast(msg,type){ showToast(msg,type); }
 
 /* ══ INIT ══ */
+// 語言：優先用 localStorage，其次偵測系統語言
+const savedLang = localStorage.getItem('lang');
+const sysLang = navigator.language || navigator.userLanguage || 'zh';
+const initLang = savedLang || (sysLang.startsWith('zh') ? 'zh' : 'en');
+setLang(initLang);
+
 setTheme('light');
 
 // OAuth redirect 回來時，網址 hash 裡有 token，讓 Supabase 處理後清掉
@@ -917,7 +1091,7 @@ loadReports();
 map.whenReady(()=>{
   setTimeout(()=>{
     const attr = document.querySelector('.leaflet-control-attribution');
-    if(attr) attr.innerHTML += ' | <a href="/privacy" target="_blank">隱私權政策</a> | <a onclick="openContact(null,null)" style="cursor:pointer;">聯絡管理員</a>';
+    if(attr) attr.innerHTML += ` | <a href="/privacy" target="_blank">${t('privacy')}</a> | <a onclick="openContact(null,null)" style="cursor:pointer;">${t('contact-admin')}</a>`;
   }, 300);
 });
 </script>
