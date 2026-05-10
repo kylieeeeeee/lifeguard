@@ -33,9 +33,9 @@ body{font-family:'Noto Sans TC','PingFang TC',sans-serif;background:var(--bg);co
   background:linear-gradient(180deg,var(--topbar) 0%,transparent 100%);
   padding:12px 14px 48px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;}
 .logo{pointer-events:all;display:flex;align-items:center;gap:10px;}
-.logo-mark{font-size:28px;line-height:1;display:flex;align-items:center;}
-.logo-text{font-size:15px;font-weight:900;color:var(--text);letter-spacing:-.02em;}
-.logo-sub{font-size:9px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-top:2px;}
+.logo-mark{font-size:28px;line-height:1;display:flex;align-items:flex-start;padding-top:1px;}
+.logo-text{font-size:17px;font-weight:900;color:var(--text);letter-spacing:-.02em;}
+.logo-sub{font-size:10px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-top:2px;}
 .topbar-right{pointer-events:all;display:flex;align-items:center;gap:6px;flex-shrink:0;}
 .theme-toggle{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
 .tbtn{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:6px 8px;font-size:12px;transition:all .15s;}
@@ -180,7 +180,8 @@ textarea.finput{resize:vertical;min-height:75px;}
   border-top:1px solid var(--popup-border);line-height:1.6;}
 .popup-mod{font-size:11px;color:var(--text-muted);margin-top:10px;padding-top:9px;
   border-top:1px solid var(--popup-border);text-align:center;}
-.popup-mod a{color:var(--accent);text-decoration:none;}
+.popup-mod a{color:var(--accent);text-decoration:none;cursor:pointer;}
+.contact-modal{max-width:420px;}
 </style>
 </head>
 <body>
@@ -357,6 +358,33 @@ textarea.finput{resize:vertical;min-height:75px;}
   </div>
 </div>
 
+<!-- CONTACT MODAL -->
+<div class="overlay" id="ov-contact" onclick="ovClick(event,'ov-contact')">
+  <div class="modal contact-modal">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">聯絡管理員</div>
+        <div class="modal-subtitle" id="contact-venue-label"></div>
+      </div>
+      <button class="close" onclick="closeOv('ov-contact')">✕</button>
+    </div>
+    <div class="fg">
+      <label class="flabel">聯絡原因<span class="req">*</span></label>
+      <div class="choice-group">
+        <label class="choice"><input type="radio" name="contact-type" value="修改回報內容"> 修改回報內容</label>
+        <label class="choice"><input type="radio" name="contact-type" value="刪除我的回報"> 刪除我的回報</label>
+        <label class="choice"><input type="radio" name="contact-type" value="回報資訊有誤"> 回報資訊有誤</label>
+        <label class="choice"><input type="radio" name="contact-type" value="其他問題"> 其他問題</label>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="flabel">說明內容<span class="req">*</span></label>
+      <textarea id="contact-msg" class="finput" placeholder="請描述你的問題或修改需求..." style="min-height:100px;"></textarea>
+    </div>
+    <button class="submit" id="contact-submit" onclick="submitContact()">送出</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- MAP PICK HINT -->
@@ -466,7 +494,7 @@ function popHTML(pid, idx){
     <div class="popup-row">🧹 雜事：<span>${chores}</span></div>
     <div class="popup-row">👤 獨立當班：<span>${r.alone}</span></div>
     ${r.comment?`<div class="popup-comment">💬 ${r.comment}</div>`:''}
-    <div class="popup-mod">若需修改，請 <a href="mailto:b34104015@gs.ncku.edu.tw">聯絡管理員</a></div>
+    <div class="popup-mod">若需修改，請 <a onclick="openContact('${pid}',${idx})">聯絡管理員</a></div>
   </div>`;
 }
 
@@ -807,6 +835,44 @@ function resetForm(){
 function updateStats(){
   let t=0; venues.forEach(v=>t+=v.reports.length);
   document.getElementById('stat-total').textContent=t;
+}
+
+/* ══ CONTACT ══ */
+let contactPid=null, contactReportId=null;
+function openContact(pid, idx){
+  if(!user){ openOv('ov-login'); return; }
+  const v=venues.get(pid);
+  const r=v?.reports[idx];
+  contactPid=pid;
+  contactReportId=r?.id||null;
+  document.getElementById('contact-venue-label').textContent=v?.name||'';
+  document.getElementById('contact-msg').value='';
+  document.querySelectorAll('input[name="contact-type"]').forEach(el=>el.checked=false);
+  openOv('ov-contact');
+}
+async function submitContact(){
+  const type=document.querySelector('input[name="contact-type"]:checked')?.value;
+  const msg=document.getElementById('contact-msg').value.trim();
+  if(!type) return toast('請選擇聯絡原因','err');
+  if(!msg)  return toast('請填寫說明內容','err');
+
+  const btn=document.getElementById('contact-submit');
+  btn.disabled=true; btn.textContent='送出中...';
+
+  const v=venues.get(contactPid);
+  const {error}=await sb.from('contacts').insert({
+    user_id:    user.id,
+    user_name:  user.name,
+    place_name: v?.name||'',
+    report_id:  contactReportId,
+    message:    `【${type}】${msg}`,
+    status:     'unread'
+  });
+
+  btn.disabled=false; btn.textContent='送出';
+  if(error){ toast('送出失敗：'+error.message,'err'); return; }
+  closeOv('ov-contact');
+  showToast('✅ 已送出，管理員會盡快處理！');
 }
 
 /* ══ OVERLAY ══ */
