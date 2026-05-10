@@ -31,7 +31,7 @@ body{font-family:'Noto Sans TC','PingFang TC',sans-serif;background:var(--bg);co
 #map{width:100%;height:100dvh;}
 .topbar{position:absolute;top:0;left:0;right:0;z-index:1000;
   background:linear-gradient(180deg,var(--topbar) 0%,transparent 100%);
-  padding:12px 14px 48px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;}
+  padding:12px 16px 48px;display:flex;align-items:center;justify-content:space-between;pointer-events:none;}
 .logo{pointer-events:all;display:flex;align-items:center;gap:10px;}
 .logo-mark{font-size:28px;line-height:1;display:flex;align-items:center;}
 .logo-text{font-size:17px;font-weight:900;color:var(--text);letter-spacing:-.02em;min-width:160px;}
@@ -46,7 +46,7 @@ body{font-family:'Noto Sans TC','PingFang TC',sans-serif;background:var(--bg);co
   color:var(--text-muted);cursor:pointer;padding:7px 12px;font-size:12px;font-weight:600;
   font-family:inherit;transition:all .15s;}
 .logout-btn:hover{border-color:#dc2626;color:#dc2626;}
-.legend{position:absolute;bottom:30px;left:18px;z-index:1000;
+.legend{position:absolute;bottom:30px;left:16px;z-index:1000;
   background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;}
 .legend-title{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px;}
 .legend-item{display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:5px;color:var(--text);}
@@ -201,6 +201,21 @@ textarea.finput{resize:vertical;min-height:75px;}
     <div class="theme-toggle">
       <button class="tbtn" id="btn-zh" onclick="setLang('zh')">中</button>
       <button class="tbtn" id="btn-en" onclick="setLang('en')">EN</button>
+    </div>
+    <!-- 搜尋場館 -->
+    <div style="position:relative;" id="venue-search-wrap">
+      <input id="venue-search" type="text" autocomplete="off"
+        placeholder="搜尋場館…"
+        oninput="onVenueSearch()" onfocus="onVenueSearch()"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+          height:32px;padding:0 10px;font-family:inherit;font-size:13px;color:var(--text);
+          outline:none;width:140px;transition:width .2s,border-color .15s;"
+        onfocusin="this.style.width='200px';this.style.borderColor='var(--accent)'"
+        onfocusout="this.style.width='140px';this.style.borderColor='var(--border)'">
+      <div id="venue-search-drop" style="display:none;position:absolute;top:calc(100% + 4px);right:0;
+        min-width:220px;background:var(--surface);border:1px solid var(--border);border-radius:10px;
+        overflow:hidden;box-shadow:0 8px 24px var(--shadow);z-index:1100;max-height:260px;overflow-y:auto;">
+      </div>
     </div>
     <div class="stat-card">
       <div class="stat-num" id="stat-total">0</div>
@@ -583,6 +598,8 @@ function applyI18n(){
   if(co) co.placeholder=t('chores-other-placeholder');
   const cm=document.getElementById('contact-msg');
   if(cm) cm.placeholder=t('contact-msg-placeholder');
+  const vs=document.getElementById('venue-search');
+  if(vs) vs.placeholder=lang==='en'?'Search venues…':'搜尋場館…';
   // 若有 popup 開著，重新渲染以更新語言
   if(popOpenPid && markers.has(popOpenPid)){
     const mk=markers.get(popOpenPid);
@@ -1152,7 +1169,55 @@ if (window.location.hash && window.location.hash.includes('access_token')) {
     history.replaceState(null, '', window.location.pathname);
   });
 }
-map.on('click',()=>document.getElementById('ac-drop').classList.remove('open'));
+map.on('click',()=>{
+  document.getElementById('ac-drop').classList.remove('open');
+  document.getElementById('venue-search-drop').style.display='none';
+});
+
+/* ══ VENUE SEARCH ══ */
+function onVenueSearch(){
+  const q = document.getElementById('venue-search').value.trim().toLowerCase();
+  const drop = document.getElementById('venue-search-drop');
+  if(!q || venues.size===0){ drop.style.display='none'; return; }
+
+  const matches = [...venues.entries()].filter(([,v])=>
+    v.name.toLowerCase().includes(q) || v.address.toLowerCase().includes(q)
+  );
+
+  if(!matches.length){
+    drop.innerHTML=`<div style="padding:10px 13px;font-size:13px;color:var(--text-muted);">${lang==='en'?'No venues found':'找不到符合場館'}</div>`;
+    drop.style.display='block'; return;
+  }
+
+  drop.innerHTML = matches.map(([pid,v])=>{
+    const a = avg(v.reports);
+    const col = avgClr(v.reports);
+    return `<div onclick="goToVenue('${pid}')"
+      style="padding:10px 13px;cursor:pointer;border-bottom:1px solid var(--border);
+        display:flex;align-items:center;gap:10px;transition:background .12s;"
+      onmouseover="this.style.background='var(--surface2)'"
+      onmouseout="this.style.background=''">
+      <div style="width:28px;height:28px;border-radius:50%;background:${col};flex-shrink:0;
+        display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:900;">
+        ${v.reports.length===1?v.reports[0].rating:a.toFixed(1)}
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--text);">${v.name}</div>
+        <div style="font-size:11px;color:var(--text-muted);">${v.reports.length} ${lang==='en'?'report(s)':'筆回報'}</div>
+      </div>
+    </div>`;
+  }).join('');
+  drop.style.display='block';
+}
+
+function goToVenue(pid){
+  const v = venues.get(pid);
+  if(!v) return;
+  document.getElementById('venue-search').value='';
+  document.getElementById('venue-search-drop').style.display='none';
+  map.setView([v.lat, v.lon], 16, {animate:true, duration:.8});
+  setTimeout(()=>openPopup(pid,0), 700);
+}
 
 function alignActionBtn(){
   const zoom=document.querySelector('.leaflet-control-zoom');
