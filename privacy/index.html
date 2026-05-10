@@ -3,122 +3,438 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>隱私權政策與服務條款 | 救生員避雷地圖</title>
+<title>隱私權政策 | 救生員避雷地圖</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛟</text></svg>">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Noto Sans TC','PingFang TC',sans-serif;background:#f5f7fa;color:#1a2e42;line-height:1.8;}
-header{background:linear-gradient(135deg,#0891b2,#0e7490);color:#fff;padding:32px 24px 28px;}
-.header-inner{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:14px;}
-.logo-mark{width:44px;height:44px;background:rgba(255,255,255,.2);border-radius:12px;
-  display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
-.site-name{font-size:20px;font-weight:900;letter-spacing:-.02em;}
-.site-sub{font-size:11px;opacity:.8;margin-top:2px;letter-spacing:.08em;}
-.back{margin-top:16px;}
-.back a{color:rgba(255,255,255,.8);text-decoration:none;font-size:13px;}
-.back a:hover{color:#fff;}
+:root{
+  --bg:#f5f7fa;--surface:#fff;--surface2:#f3f7fb;--surface3:#e6eef7;
+  --accent:#0891b2;--accent2:#0e7490;--accent-glow:rgba(8,145,178,.18);
+  --text:#1a2e42;--text-muted:#6b8aab;--border:#c8d9eb;--shadow:rgba(0,30,70,.12);
+  --overlay:rgba(90,120,160,.38);--input-bg:#f3f7fb;
+}
+[data-theme="dark"]{
+  --bg:#060d18;--surface:#0c1929;--surface2:#101f33;--surface3:#152540;
+  --accent:#06b6d4;--accent2:#0891b2;--accent-glow:rgba(6,182,212,.25);
+  --text:#dde7f0;--text-muted:#4d6a85;--border:#1a3050;--shadow:rgba(0,0,0,.55);
+  --overlay:rgba(6,13,24,.72);--input-bg:#101f33;
+}
+html,body{min-height:100%;background:var(--bg);color:var(--text);}
+body{font-family:'Noto Sans TC','PingFang TC',sans-serif;line-height:1.8;}
+
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo-mark{font-size:26px;line-height:1;}
+.logo-text{font-size:16px;font-weight:900;color:var(--text);}
+.header-right{display:flex;align-items:center;gap:8px;}
+.toggle-group{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;height:32px;}
+.tbtn{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:0 10px;font-size:13px;height:100%;font-family:inherit;}
+.tbtn.active{background:var(--accent);color:#fff;}
+.back-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+  color:var(--text-muted);cursor:pointer;padding:0 14px;font-size:13px;font-weight:600;
+  font-family:inherit;height:32px;text-decoration:none;display:flex;align-items:center;}
+.back-btn:hover{border-color:var(--accent);color:var(--accent);}
+
 main{max-width:720px;margin:0 auto;padding:40px 24px 80px;}
-h1{font-size:24px;font-weight:900;color:#0891b2;margin-bottom:6px;}
-.updated{font-size:12px;color:#6b8aab;margin-bottom:36px;}
-h2{font-size:16px;font-weight:700;color:#1a2e42;margin:32px 0 10px;padding-left:12px;
-  border-left:3px solid #0891b2;}
-p{font-size:14px;color:#334e68;margin-bottom:12px;}
-ul{font-size:14px;color:#334e68;padding-left:20px;margin-bottom:12px;}
-ul li{margin-bottom:6px;}
-.card{background:#fff;border:1px solid #c8d9eb;border-radius:12px;padding:20px 24px;margin-bottom:12px;}
-.contact{background:#e0f2fe;border:1px solid #7dd3fc;border-radius:10px;
-  padding:16px 20px;margin-top:32px;font-size:13px;color:#0369a1;}
-.contact a{color:#0369a1;font-weight:700;}
-footer{text-align:center;font-size:12px;color:#6b8aab;padding:24px;}
+h1{font-size:22px;font-weight:900;color:var(--accent);margin-bottom:6px;}
+.updated{font-size:12px;color:var(--text-muted);margin-bottom:32px;}
+h2{font-size:15px;font-weight:700;color:var(--text);margin:28px 0 8px;padding-left:10px;border-left:3px solid var(--accent);}
+h3{font-size:13px;font-weight:700;color:var(--text);margin:16px 0 6px;}
+p{font-size:14px;color:var(--text-muted);margin-bottom:10px;}
+ul{font-size:14px;color:var(--text-muted);padding-left:18px;margin-bottom:10px;}
+ul li{margin-bottom:5px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:14px;}
+
+.contact-bar{background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+  padding:16px 20px;margin-top:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.contact-bar-text{font-size:13px;color:var(--text-muted);}
+.contact-bar-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;
+  border:none;border-radius:8px;padding:9px 18px;font-family:inherit;font-size:13px;
+  font-weight:700;cursor:pointer;}
+
+footer{text-align:center;font-size:12px;color:var(--text-muted);padding:24px;border-top:1px solid var(--border);}
+
+/* ── OVERLAY / MODAL ── */
+.overlay{position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(10px);
+  z-index:2000;display:none;align-items:center;justify-content:center;padding:16px;}
+.overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;
+  width:100%;max-width:440px;padding:24px 26px;box-shadow:0 30px 70px var(--shadow);animation:slideUp .22s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;}
+.modal-title{font-size:17px;font-weight:900;color:var(--text);}
+.close{width:30px;height:30px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:7px;color:var(--text-muted);cursor:pointer;font-size:15px;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.close:hover{border-color:var(--accent);color:var(--accent);}
+.fg{margin-bottom:14px;}
+.flabel{display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.req{color:var(--accent);margin-left:2px;}
+.finput{width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:9px;
+  padding:10px 12px;color:var(--text);font-family:inherit;font-size:14px;outline:none;}
+.finput:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow);}
+.finput::placeholder{color:var(--text-muted);}
+textarea.finput{resize:vertical;min-height:90px;}
+.choice-group{display:flex;flex-direction:column;gap:6px;}
+.choice{display:flex;align-items:center;gap:9px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:9px;padding:9px 12px;cursor:pointer;font-size:13px;color:var(--text);}
+.choice:hover{border-color:var(--accent);}
+.choice input{accent-color:var(--accent);width:14px;height:14px;flex-shrink:0;}
+.submit-btn{width:100%;margin-top:4px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;border:none;border-radius:10px;padding:13px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+.toast{position:fixed;bottom:24px;right:20px;z-index:4000;background:#065f46;
+  border:1px solid #059669;color:#d1fae5;padding:12px 18px;border-radius:10px;
+  font-size:13px;font-weight:600;transform:translateY(70px);opacity:0;transition:all .3s;pointer-events:none;}
+.toast.err{background:#7f1d1d;border-color:#dc2626;color:#fecaca;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* LOGIN */
+.login-modal{max-width:360px;}
+.login-logo{text-align:center;margin-bottom:14px;}
+.big-emoji{font-size:44px;}
+.login-desc{font-size:13px;color:var(--text-muted);text-align:center;margin-bottom:18px;line-height:1.7;}
+.google-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);
+  color:var(--text);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+.google-btn:hover{border-color:var(--accent);}
+.gicon{width:20px;height:20px;flex-shrink:0;}
 </style>
 </head>
-<body>
+<body data-theme="light">
+
 <header>
-  <div class="header-inner">
+  <a class="logo" href="/">
     <div class="logo-mark">🛟</div>
-    <div>
-      <div class="site-name">救生員避雷地圖</div>
-      <div class="site-sub">LIFEGUARD RADAR</div>
+    <div class="logo-text" id="logo-text">救生員避雷地圖</div>
+  </a>
+  <div class="header-right">
+    <div class="toggle-group">
+      <button class="tbtn" id="btn-light" onclick="setTheme('light')">☀️</button>
+      <button class="tbtn" id="btn-dark"  onclick="setTheme('dark')">🌙</button>
     </div>
-  </div>
-  <div style="max-width:720px;margin:0 auto;">
-    <div class="back"><a href="/">← 返回地圖</a></div>
+    <div class="toggle-group">
+      <button class="tbtn" id="btn-zh" onclick="setLang('zh')">中</button>
+      <button class="tbtn" id="btn-en" onclick="setLang('en')">EN</button>
+    </div>
+    <a class="back-btn" href="/" id="back-btn">← 返回地圖</a>
   </div>
 </header>
 
 <main>
-  <h1>隱私權政策與服務條款</h1>
-  <div class="updated">最後更新：2026 年 5 月</div>
+  <h1 id="page-title">隱私權政策與服務條款</h1>
+  <div class="updated" id="updated">最後更新：2026 年 5 月</div>
 
-  <!-- 隱私權政策 -->
   <div class="card">
-    <h2>一、隱私權政策</h2>
+    <h2 id="privacy-title">一、隱私權政策</h2>
 
-    <h2 style="border:none;padding:0;font-size:14px;margin:16px 0 8px;">我們蒐集的資料</h2>
-    <p>當您使用 Google 帳號登入時，我們會取得：</p>
-    <ul>
+    <h3 id="collect-title">我們蒐集的資料</h3>
+    <p id="collect-desc">當您使用 Google 帳號登入時，我們會取得：</p>
+    <ul id="collect-list">
       <li>Google 帳號的唯一識別碼（User ID）</li>
       <li>顯示名稱（用於回報者標示）</li>
       <li>電子郵件地址（僅用於帳號識別，不對外顯示）</li>
     </ul>
 
-    <h2 style="border:none;padding:0;font-size:14px;margin:16px 0 8px;">回報內容</h2>
-    <p>您提交的場館工作回報內容（包含場館名稱、薪資、工作條件、心得等）將儲存於我們的資料庫，並在審核通過後公開顯示於地圖上。若您選擇「匿名提交」，您的名稱將不會出現在回報中，但您的帳號 ID 仍會記錄以防止重複回報。</p>
+    <h3 id="report-data-title">回報內容</h3>
+    <p id="report-data-desc">您提交的場館工作回報內容（包含場館名稱、薪資、工作條件、心得等）將儲存於我們的資料庫，並在審核通過後公開顯示於地圖上。若您選擇「匿名提交」，您的名稱將不會出現在回報中，但您的帳號 ID 仍會記錄以防止重複回報。</p>
 
-    <h2 style="border:none;padding:0;font-size:14px;margin:16px 0 8px;">資料使用方式</h2>
-    <ul>
+    <h3 id="usage-title">資料使用方式</h3>
+    <ul id="usage-list">
       <li>顯示於救生員避雷地圖供其他使用者參考</li>
       <li>防止同一帳號對同一場館重複回報</li>
       <li>由 AI 自動審核回報內容是否合規</li>
     </ul>
 
-    <h2 style="border:none;padding:0;font-size:14px;margin:16px 0 8px;">資料儲存與安全</h2>
-    <p>所有資料儲存於 Supabase（PostgreSQL 資料庫），位於 ap-southeast-1 區域。我們採用行列安全政策（RLS）保護資料，未審核的回報不對外公開。</p>
+    <h3 id="storage-title">資料儲存與安全</h3>
+    <p id="storage-desc">所有資料儲存於 Supabase（PostgreSQL 資料庫），位於 ap-southeast-1 區域。我們採用行列安全政策（RLS）保護資料，未審核的回報不對外公開。</p>
 
-    <h2 style="border:none;padding:0;font-size:14px;margin:16px 0 8px;">第三方服務</h2>
-    <ul>
-      <li><strong>Google OAuth</strong>：用於帳號登入驗證</li>
-      <li><strong>Google Places API</strong>：用於場館地點搜尋</li>
-      <li><strong>OpenStreetMap / CartoDB</strong>：用於地圖底圖顯示</li>
-      <li><strong>Groq AI</strong>：用於回報內容初步審核</li>
+    <h3 id="third-party-title">第三方服務</h3>
+    <ul id="third-party-list">
+      <li>Google OAuth：用於帳號登入驗證</li>
+      <li>Google Places API：用於場館地點搜尋</li>
+      <li>OpenStreetMap / CartoDB：用於地圖底圖顯示</li>
+      <li>Groq AI：用於回報內容初步審核</li>
     </ul>
 
-    <h2 style="border:none;padding:0;font-size:14px;margin:16px 0 8px;">您的權利</h2>
-    <p>您可以隨時透過聯絡管理員要求刪除您的回報資料或帳號資訊。</p>
+    <h3 id="rights-title">您的權利</h3>
+    <p id="rights-desc">您可以隨時透過聯絡管理員要求刪除您的回報資料或帳號資訊。</p>
   </div>
 
-  <!-- 服務條款 -->
   <div class="card">
-    <h2>二、服務條款</h2>
+    <h2 id="terms-title">二、服務條款</h2>
 
-    <h2 style="border:none;padding:0;font-size:14px;margin:16px 0 8px;">服務說明</h2>
-    <p>救生員避雷地圖是一個供救生員分享游泳場館工作條件的平台，所有回報均為使用者自主提交，本站不保證資訊的完整性或即時性。</p>
+    <h3 id="service-title">服務說明</h3>
+    <p id="service-desc">救生員避雷地圖是一個供救生員分享游泳場館工作條件的平台，所有回報均為使用者自主提交，本站不保證資訊的完整性或即時性。</p>
 
-    <h2 style="border:none;padding:0;font-size:14px;margin:16px 0 8px;">使用者責任</h2>
-    <ul>
+    <h3 id="user-title">使用者責任</h3>
+    <ul id="user-list">
       <li>回報內容須為真實的工作經驗，不得惡意造假或蓄意誹謗</li>
       <li>不得提交廣告、垃圾訊息或與救生員工作無關的內容</li>
       <li>每個帳號對每個場館只能提交一次回報</li>
       <li>如需修改回報，請聯絡管理員</li>
     </ul>
 
-    <h2 style="border:none;padding:0;font-size:14px;margin:16px 0 8px;">內容審核</h2>
-    <p>所有回報提交後會先經過 AI 初步審核，再由管理員人工確認。不符合規定的回報將被拒絕或下架，管理員保有最終決定權。</p>
+    <h3 id="review-title">內容審核</h3>
+    <p id="review-desc">所有回報提交後會先經過 AI 初步審核，再由管理員人工確認。不符合規定的回報將被拒絕或下架，管理員保有最終決定權。</p>
 
-    <h2 style="border:none;padding:0;font-size:14px;margin:16px 0 8px;">免責聲明</h2>
-    <p>本站提供的資訊僅供參考，所有回報內容為使用者個人意見，不代表本站立場。使用者應自行判斷資訊的適用性，本站對因使用本站資訊而產生的任何損失不負責任。</p>
+    <h3 id="disclaimer-title">免責聲明</h3>
+    <p id="disclaimer-desc">本站提供的資訊僅供參考，所有回報內容為使用者個人意見，不代表本站立場。使用者應自行判斷資訊的適用性，本站對因使用本站資訊而產生的任何損失不負責任。</p>
 
-    <h2 style="border:none;padding:0;font-size:14px;margin:16px 0 8px;">服務變更</h2>
-    <p>本站保留隨時修改或終止服務的權利，條款如有變更將於本頁面更新。</p>
+    <h3 id="change-title">服務變更</h3>
+    <p id="change-desc">本站保留隨時修改或終止服務的權利，條款如有變更將於本頁面更新。</p>
   </div>
 
-  <div class="contact">
-    如有任何問題或需要刪除資料，請聯絡管理員：
-    <a href="mailto:b34104015@gs.ncku.edu.tw">b34104015@gs.ncku.edu.tw</a>
+  <div class="contact-bar">
+    <div class="contact-bar-text" id="contact-bar-text">如有任何問題或需要刪除資料，請聯絡管理員</div>
+    <button class="contact-bar-btn" id="contact-bar-btn" onclick="openContact()">聯絡管理員</button>
   </div>
 </main>
 
-<footer>© 2026 救生員避雷地圖 Lifeguard Radar</footer>
+<footer id="footer-text">© 2026 救生員避雷地圖 Lifeguard Radar</footer>
+
+<!-- LOGIN OVERLAY -->
+<div class="overlay" id="ov-login" onclick="if(event.target.id==='ov-login')closeOv('ov-login')">
+  <div class="modal login-modal">
+    <div class="modal-head">
+      <div class="modal-title" id="login-title">登入後才能聯絡管理員</div>
+      <button class="close" onclick="closeOv('ov-login')">✕</button>
+    </div>
+    <div class="login-logo"><span class="big-emoji">🛟</span></div>
+    <div class="login-desc" id="login-desc">請先使用 Google 帳號登入，才能送出訊息給管理員。</div>
+    <button class="google-btn" onclick="loginWithGoogle()">
+      <svg class="gicon" viewBox="0 0 48 48">
+        <path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 2.9l5.7-5.7C34.5 6.5 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.6-.4-3.9z"/>
+        <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c3.1 0 5.8 1.1 7.9 2.9l5.7-5.7C34.5 6.5 29.5 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/>
+        <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.3 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8H6.3C9.6 35.7 16.3 44 24 44z"/>
+        <path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l6.2 5.2C40.8 36.1 44 30.5 44 24c0-1.3-.1-2.6-.4-3.9z"/>
+      </svg>
+      <span id="google-login-btn">使用 Google 帳號登入</span>
+    </button>
+  </div>
+</div>
+
+<!-- CONTACT OVERLAY -->
+<div class="overlay" id="ov-contact" onclick="if(event.target.id==='ov-contact')closeOv('ov-contact')">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="contact-title">聯絡管理員</div>
+      <button class="close" onclick="closeOv('ov-contact')">✕</button>
+    </div>
+    <div class="fg">
+      <label class="flabel"><span id="reason-label">聯絡原因</span><span class="req">*</span></label>
+      <div class="choice-group">
+        <label class="choice"><input type="radio" name="contact-type" value="修改回報內容"> <span id="cr1">修改回報內容</span></label>
+        <label class="choice"><input type="radio" name="contact-type" value="刪除我的回報"> <span id="cr2">刪除我的回報</span></label>
+        <label class="choice"><input type="radio" name="contact-type" value="回報資訊有誤"> <span id="cr3">回報資訊有誤</span></label>
+        <label class="choice"><input type="radio" name="contact-type" value="其他問題"> <span id="cr4">其他問題</span></label>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="flabel"><span id="msg-label">說明內容</span><span class="req">*</span></label>
+      <textarea id="contact-msg" class="finput" placeholder="請描述你的問題或修改需求..." style="min-height:90px;"></textarea>
+    </div>
+    <button class="submit-btn" id="contact-submit" onclick="submitContact()">送出</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://euinsntybozxjhsddeqm.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_AbidJYNYkRcpXqj49kscCQ_VMWZlx2L';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { flowType:'pkce', detectSessionInUrl:true, persistSession:true }
+});
+
+let user = null;
+let lang = 'zh';
+
+/* ── I18N ── */
+const DICT = {
+  zh:{
+    'logo-text':'救生員避雷地圖',
+    'back-btn':'← 返回地圖',
+    'page-title':'隱私權政策與服務條款',
+    'updated':'最後更新：2026 年 5 月',
+    'privacy-title':'一、隱私權政策',
+    'collect-title':'我們蒐集的資料',
+    'collect-desc':'當您使用 Google 帳號登入時，我們會取得：',
+    'collect-list':'<li>Google 帳號的唯一識別碼（User ID）</li><li>顯示名稱（用於回報者標示）</li><li>電子郵件地址（僅用於帳號識別，不對外顯示）</li>',
+    'report-data-title':'回報內容',
+    'report-data-desc':'您提交的場館工作回報內容（包含場館名稱、薪資、工作條件、心得等）將儲存於我們的資料庫，並在審核通過後公開顯示於地圖上。若您選擇「匿名提交」，您的名稱將不會出現在回報中，但您的帳號 ID 仍會記錄以防止重複回報。',
+    'usage-title':'資料使用方式',
+    'usage-list':'<li>顯示於救生員避雷地圖供其他使用者參考</li><li>防止同一帳號對同一場館重複回報</li><li>由 AI 自動審核回報內容是否合規</li>',
+    'storage-title':'資料儲存與安全',
+    'storage-desc':'所有資料儲存於 Supabase（PostgreSQL 資料庫），位於 ap-southeast-1 區域。我們採用行列安全政策（RLS）保護資料，未審核的回報不對外公開。',
+    'third-party-title':'第三方服務',
+    'third-party-list':'<li>Google OAuth：用於帳號登入驗證</li><li>Google Places API：用於場館地點搜尋</li><li>OpenStreetMap / CartoDB：用於地圖底圖顯示</li><li>Groq AI：用於回報內容初步審核</li>',
+    'rights-title':'您的權利',
+    'rights-desc':'您可以隨時透過聯絡管理員要求刪除您的回報資料或帳號資訊。',
+    'terms-title':'二、服務條款',
+    'service-title':'服務說明',
+    'service-desc':'救生員避雷地圖是一個供救生員分享游泳場館工作條件的平台，所有回報均為使用者自主提交，本站不保證資訊的完整性或即時性。',
+    'user-title':'使用者責任',
+    'user-list':'<li>回報內容須為真實的工作經驗，不得惡意造假或蓄意誹謗</li><li>不得提交廣告、垃圾訊息或與救生員工作無關的內容</li><li>每個帳號對每個場館只能提交一次回報</li><li>如需修改回報，請聯絡管理員</li>',
+    'review-title':'內容審核',
+    'review-desc':'所有回報提交後會先經過 AI 初步審核，再由管理員人工確認。不符合規定的回報將被拒絕或下架，管理員保有最終決定權。',
+    'disclaimer-title':'免責聲明',
+    'disclaimer-desc':'本站提供的資訊僅供參考，所有回報內容為使用者個人意見，不代表本站立場。使用者應自行判斷資訊的適用性，本站對因使用本站資訊而產生的任何損失不負責任。',
+    'change-title':'服務變更',
+    'change-desc':'本站保留隨時修改或終止服務的權利，條款如有變更將於本頁面更新。',
+    'contact-bar-text':'如有任何問題或需要刪除資料，請聯絡管理員',
+    'contact-bar-btn':'聯絡管理員',
+    'footer-text':'© 2026 救生員避雷地圖 Lifeguard Radar',
+    'login-title':'登入後才能聯絡管理員',
+    'login-desc':'請先使用 Google 帳號登入，才能送出訊息給管理員。',
+    'google-login-btn':'使用 Google 帳號登入',
+    'contact-title':'聯絡管理員',
+    'reason-label':'聯絡原因',
+    'cr1':'修改回報內容','cr2':'刪除我的回報','cr3':'回報資訊有誤','cr4':'其他問題',
+    'msg-label':'說明內容',
+    'contact-submit':'送出',
+    'contact-msg-placeholder':'請描述你的問題或修改需求...',
+    'err-reason':'請選擇聯絡原因','err-msg':'請填寫說明內容',
+    'toast-sent':'✅ 已送出，管理員會盡快處理！',
+  },
+  en:{
+    'logo-text':'Lifeguard Radar',
+    'back-btn':'← Back to Map',
+    'page-title':'Privacy Policy & Terms of Service',
+    'updated':'Last updated: May 2026',
+    'privacy-title':'I. Privacy Policy',
+    'collect-title':'Data We Collect',
+    'collect-desc':'When you sign in with Google, we collect:',
+    'collect-list':'<li>Your Google Account unique ID (User ID)</li><li>Display name (shown as reporter)</li><li>Email address (for account identification only, not publicly displayed)</li>',
+    'report-data-title':'Report Content',
+    'report-data-desc':'Reports you submit (venue name, pay, working conditions, comments, etc.) are stored in our database and displayed on the map after approval. If you choose anonymous submission, your name will not appear, but your account ID is still recorded to prevent duplicate reports.',
+    'usage-title':'How We Use Your Data',
+    'usage-list':'<li>Display on Lifeguard Radar map for other users</li><li>Prevent duplicate reports from the same account for the same venue</li><li>AI-assisted moderation of report content</li>',
+    'storage-title':'Data Storage & Security',
+    'storage-desc':'All data is stored in Supabase (PostgreSQL) in the ap-southeast-1 region. We use Row Level Security (RLS) to protect data; unreviewed reports are not publicly accessible.',
+    'third-party-title':'Third-Party Services',
+    'third-party-list':'<li>Google OAuth: Account authentication</li><li>Google Places API: Venue location search</li><li>OpenStreetMap / CartoDB: Map tile display</li><li>Groq AI: Preliminary report moderation</li>',
+    'rights-title':'Your Rights',
+    'rights-desc':'You may request deletion of your report data or account information at any time by contacting the admin.',
+    'terms-title':'II. Terms of Service',
+    'service-title':'Service Description',
+    'service-desc':'Lifeguard Radar is a platform for lifeguards to share swimming venue working conditions. All reports are user-submitted; we do not guarantee completeness or timeliness of information.',
+    'user-title':'User Responsibilities',
+    'user-list':'<li>Reports must be based on genuine work experience; fabrication or defamation is prohibited</li><li>Do not submit advertisements, spam, or content unrelated to lifeguard work</li><li>One report per venue per account</li><li>Contact admin to modify a submitted report</li>',
+    'review-title':'Content Moderation',
+    'review-desc':'All reports undergo AI moderation first, then human review by an admin. Non-compliant reports will be rejected or removed. The admin has final authority.',
+    'disclaimer-title':'Disclaimer',
+    'disclaimer-desc':'Information on this site is for reference only. All report content represents individual user opinions and does not reflect the site\'s stance. We are not responsible for any losses resulting from use of this information.',
+    'change-title':'Service Changes',
+    'change-desc':'We reserve the right to modify or terminate the service at any time. Changes to these terms will be reflected on this page.',
+    'contact-bar-text':'For questions or data deletion requests, please contact the admin.',
+    'contact-bar-btn':'Contact Admin',
+    'footer-text':'© 2026 Lifeguard Radar',
+    'login-title':'Sign in to Contact Admin',
+    'login-desc':'Please sign in with your Google account to send a message to the admin.',
+    'google-login-btn':'Sign in with Google',
+    'contact-title':'Contact Admin',
+    'reason-label':'Reason',
+    'cr1':'Modify report content','cr2':'Delete my report','cr3':'Incorrect information','cr4':'Other',
+    'msg-label':'Details',
+    'contact-submit':'Send',
+    'contact-msg-placeholder':'Describe your issue or request...',
+    'err-reason':'Please select a reason','err-msg':'Please enter details',
+    'toast-sent':'✅ Message sent! Admin will respond soon.',
+  }
+};
+
+function t(key){ return DICT[lang][key] || DICT['zh'][key] || key; }
+
+function setLang(l){
+  lang = l;
+  localStorage.setItem('lang', l);
+  document.documentElement.setAttribute('lang', l==='zh'?'zh-TW':'en');
+  ['zh','en'].forEach(x=>document.getElementById('btn-'+x).classList.toggle('active',x===l));
+  // update all elements with id
+  Object.keys(DICT.zh).forEach(key=>{
+    const el = document.getElementById(key);
+    if(!el) return;
+    if(el.tagName==='UL') el.innerHTML = t(key);
+    else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') el.placeholder = t(key);
+    else el.innerHTML = t(key);
+  });
+  // placeholder for contact-msg
+  const cm = document.getElementById('contact-msg');
+  if(cm) cm.placeholder = t('contact-msg-placeholder');
+}
+
+function setTheme(t){
+  document.body.setAttribute('data-theme', t);
+  ['light','dark'].forEach(x=>document.getElementById('btn-'+x).classList.toggle('active',x===t));
+  localStorage.setItem('theme', t);
+}
+
+/* ── AUTH ── */
+sb.auth.onAuthStateChange((event, session)=>{
+  user = session?.user ? { id: session.user.id, name: session.user.user_metadata?.full_name || session.user.email } : null;
+  if(user && event==='SIGNED_IN') closeOv('ov-login');
+});
+
+async function loginWithGoogle(){
+  await sb.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: window.location.href } });
+}
+
+/* ── CONTACT ── */
+function openContact(){
+  if(!user){ openOv('ov-login'); return; }
+  document.getElementById('contact-msg').value='';
+  document.querySelectorAll('input[name="contact-type"]').forEach(el=>el.checked=false);
+  openOv('ov-contact');
+}
+
+async function submitContact(){
+  const type = document.querySelector('input[name="contact-type"]:checked')?.value;
+  const msg = document.getElementById('contact-msg').value.trim();
+  if(!type) return showToast(t('err-reason'),'err');
+  if(!msg)  return showToast(t('err-msg'),'err');
+
+  const btn = document.getElementById('contact-submit');
+  btn.disabled=true; btn.textContent='...';
+
+  const {error} = await sb.from('contacts').insert({
+    user_id: user.id, user_name: user.name,
+    place_name: '', report_id: null,
+    message: `【${type}】${msg}`, status: 'unread'
+  });
+
+  btn.disabled=false; btn.textContent=t('contact-submit');
+  if(error){ showToast('Error: '+error.message,'err'); return; }
+  closeOv('ov-contact');
+  showToast(t('toast-sent'));
+}
+
+function openOv(id){ document.getElementById(id).classList.add('open'); }
+function closeOv(id){ document.getElementById(id).classList.remove('open'); }
+
+function showToast(msg, type=''){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className='toast'+(type?' '+type:'');
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 3200);
+}
+
+/* ── INIT ── */
+const savedTheme = localStorage.getItem('theme') || 'light';
+setTheme(savedTheme);
+
+const savedLang = localStorage.getItem('lang');
+const sysLang = navigator.language || 'zh';
+const initLang = savedLang || (sysLang.startsWith('zh') ? 'zh' : 'en');
+setLang(initLang);
+
+if(window.location.hash && window.location.hash.includes('access_token')){
+  sb.auth.getSession().then(()=>{ history.replaceState(null,'',window.location.pathname); });
+}
+</script>
 </body>
 </html>
