@@ -554,7 +554,7 @@ function setLang(l){
   lang = l;
   localStorage.setItem('lang', l);
   document.documentElement.setAttribute('lang', l==='zh'?'zh-TW':'en');
-  document.title = l==='zh' ? '救生員避雷地圖 | Lifeguard Radar' : 'LIFEGUARD RADAR | 救生員避雷地圖';
+  document.title = l==='zh' ? '救生員避雷地圖 | LIFEGUARD RADAR' : 'LIFEGUARD RADAR | 救生員避雷地圖';
   ['zh','en'].forEach(x=>document.getElementById('btn-'+x).classList.toggle('active',x===l));
   applyI18n();
 }
