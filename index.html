@@ -364,7 +364,6 @@ textarea.finput{resize:vertical;min-height:75px;}
     <div class="modal-head">
       <div>
         <div class="modal-title">聯絡管理員</div>
-        <div class="modal-subtitle" id="contact-venue-label"></div>
       </div>
       <button class="close" onclick="closeOv('ov-contact')">✕</button>
     </div>
@@ -841,11 +840,10 @@ function updateStats(){
 let contactPid=null, contactReportId=null;
 function openContact(pid, idx){
   if(!user){ openOv('ov-login'); return; }
-  const v=venues.get(pid);
+  const v=pid?venues.get(pid):null;
   const r=v?.reports[idx];
   contactPid=pid;
   contactReportId=r?.id||null;
-  document.getElementById('contact-venue-label').textContent=v?.name||'';
   document.getElementById('contact-msg').value='';
   document.querySelectorAll('input[name="contact-type"]').forEach(el=>el.checked=false);
   openOv('ov-contact');
@@ -919,7 +917,7 @@ loadReports();
 map.whenReady(()=>{
   setTimeout(()=>{
     const attr = document.querySelector('.leaflet-control-attribution');
-    if(attr) attr.innerHTML += ' | <a href="/privacy" target="_blank">隱私權政策</a>';
+    if(attr) attr.innerHTML += ' | <a href="/privacy" target="_blank">隱私權政策</a> | <a onclick="openContact(null,null)" style="cursor:pointer;">聯絡管理員</a>';
   }, 300);
 });
 </script>
