@@ -24,18 +24,18 @@
 html,body{min-height:100%;background:var(--bg);color:var(--text);}
 body{font-family:'Noto Sans TC','PingFang TC',sans-serif;line-height:1.8;}
 
-header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;
-  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 14px;
+  display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;z-index:100;}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
-.logo-mark{font-size:26px;line-height:1;}
-.logo-text{font-size:16px;font-weight:900;color:var(--text);}
-.header-right{display:flex;align-items:center;gap:8px;}
+.logo-mark{font-size:28px;line-height:1;display:flex;align-items:center;}
+.logo-text{font-size:17px;font-weight:900;color:var(--text);letter-spacing:-.02em;min-width:160px;}
+.header-right{display:flex;align-items:center;gap:6px;}
 .toggle-group{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;height:32px;}
-.tbtn{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:0 10px;font-size:13px;height:100%;font-family:inherit;}
+.tbtn{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:0 10px;font-size:13px;height:100%;font-family:inherit;transition:all .15s;}
 .tbtn.active{background:var(--accent);color:#fff;}
 .back-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;
-  color:var(--text-muted);cursor:pointer;padding:0 14px;font-size:13px;font-weight:600;
-  font-family:inherit;height:32px;text-decoration:none;display:flex;align-items:center;}
+  color:var(--text-muted);cursor:pointer;padding:0 14px;font-size:12px;font-weight:600;
+  font-family:inherit;height:32px;text-decoration:none;display:flex;align-items:center;white-space:nowrap;}
 .back-btn:hover{border-color:var(--accent);color:var(--accent);}
 
 main{max-width:720px;margin:0 auto;padding:40px 24px 80px;}
@@ -350,6 +350,7 @@ function setLang(l){
   lang = l;
   localStorage.setItem('lang', l);
   document.documentElement.setAttribute('lang', l==='zh'?'zh-TW':'en');
+  document.title = l==='zh' ? '隱私權政策 | 救生員避雷地圖' : 'Privacy Policy | LIFEGUARD RADAR';
   ['zh','en'].forEach(x=>document.getElementById('btn-'+x).classList.toggle('active',x===l));
   // update all elements with id
   Object.keys(DICT.zh).forEach(key=>{
@@ -426,7 +427,7 @@ document.body.setAttribute('data-theme','light');
 // 語言跟隨系統，有 localStorage 紀錄就用紀錄的
 const savedLang = localStorage.getItem('lang');
 const sysLang = navigator.language || 'zh';
-const initLang = savedLang || (sysLang.startsWith('zh') ? 'zh' : 'en');
+const initLang = savedLang || (sysLang.startsWith('en') ? 'en' : 'zh');
 setLang(initLang);
 
 if(window.location.hash && window.location.hash.includes('access_token')){
