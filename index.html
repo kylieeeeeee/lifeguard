@@ -583,6 +583,11 @@ function applyI18n(){
   if(co) co.placeholder=t('chores-other-placeholder');
   const cm=document.getElementById('contact-msg');
   if(cm) cm.placeholder=t('contact-msg-placeholder');
+  // 若有 popup 開著，重新渲染以更新語言
+  if(popOpenPid && markers.has(popOpenPid)){
+    const mk=markers.get(popOpenPid);
+    mk.setPopupContent(popHTML(popOpenPid, popIdx));
+  }
 }
 
 const T = {
@@ -597,7 +602,8 @@ let acTimer=null, acResults=[];
 const venues  = new Map(); // placeId → {name,address,lat,lon,reports[]}
 const markers = new Map(); // placeId → L.Marker
 let popIdx=0;
-let popSortMode='new'; // 'new'=新到舊, 'old'=舊到新, 'high'=高到低, 'low'=低到高
+let popSortMode='new';
+let popOpenPid=null; // 追蹤目前開著的 popup
 
 function timeAgo(dateStr){
   if(!dateStr) return '';
@@ -696,7 +702,9 @@ function popHTML(pid, idx){
   const chores=r.chores&&r.chores.length?r.chores.join('、'):'無';
   const avgStr=tot>1?`<div class="popup-avg">共 ${tot} ${t('popup-reports')} · ${t('popup-avg')} <b>${avg(v.reports).toFixed(1)}</b> 分</div>`:'';
   const timeStr=timeAgo(r.created_at);
-  const sortLabel=SORT_LABELS[lang]?.[popSortMode]||popSortMode;
+  const sortOpts = Object.entries(SORT_LABELS[lang]).map(([val,lbl])=>
+    `<option value="${val}" ${val===popSortMode?'selected':''}>${lbl}</option>`
+  ).join('');
   const navBar=`<div class="popup-nav">
     <button class="nav-arr" ${idx===0?'disabled':''} onclick="event.stopPropagation();popNav('${pid}',-1)">‹</button>
     <div class="nav-mid">第&nbsp;<input class="nav-in" type="number" min="1" max="${tot}" value="${idx+1}"
@@ -704,11 +712,12 @@ function popHTML(pid, idx){
       <span style="color:var(--text-muted)">/ ${tot}</span></div>
     <button class="nav-arr" ${idx===tot-1?'disabled':''} onclick="event.stopPropagation();popNav('${pid}',1)">›</button>
   </div>
-  <div style="display:flex;justify-content:flex-end;padding:4px 12px 0;">
-    <button onclick="event.stopPropagation();toggleSort('${pid}')"
-      style="background:none;border:none;font-size:10px;color:var(--text-muted);cursor:pointer;padding:0;">
-      🔃 ${sortLabel}
-    </button>
+  <div style="padding:4px 12px 6px;display:flex;justify-content:flex-end;">
+    <select onchange="event.stopPropagation();changeSort('${pid}',this.value)"
+      style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;
+        color:var(--text-muted);font-size:10px;padding:2px 6px;font-family:inherit;cursor:pointer;outline:none;">
+      ${sortOpts}
+    </select>
   </div>`;
   return `<div class="popup-head">
     <div class="popup-name">${v.name}</div>
@@ -726,16 +735,16 @@ function popHTML(pid, idx){
   </div>`;
 }
 
-function toggleSort(pid){
-  const idx = SORT_MODES.indexOf(popSortMode);
-  popSortMode = SORT_MODES[(idx+1) % SORT_MODES.length];
-  popIdx=0;
-  const mk=markers.get(pid);
-  mk.setPopupContent(popHTML(pid,0));
+function changeSort(pid, mode){
+  popSortMode = mode;
+  popIdx = 0;
+  const mk = markers.get(pid);
+  mk.setPopupContent(popHTML(pid, 0));
   mk.openPopup();
 }
 
 function openPopup(pid,idx){
+  popOpenPid=pid;
   popIdx=idx;
   const mk=markers.get(pid);
   if(!mk) return;
@@ -776,6 +785,7 @@ function addRowToMap(row){
     const mk=L.marker([v.lat,v.lon],{icon:mkIcon(v.reports)}).addTo(map);
     mk.bindPopup('',{maxWidth:300});
     mk.on('click',()=>openPopup(pid,0));
+    mk.on('popupclose',()=>{ popOpenPid=null; });
     markers.set(pid,mk);
   }
   updateStats();
