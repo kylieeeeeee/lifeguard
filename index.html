@@ -8,7 +8,7 @@
 <meta name="application-name" content="救生員避雷地圖">
 <meta property="og:title" content="救生員避雷地圖">
 <meta property="og:site_name" content="救生員避雷地圖">
-<meta property="og:description" content="救生員匿名回報游泳場館工作條件的平台">
+<meta property="og:description" content="全國的救生員們，來這裡分享你的工作心得吧！">
 <meta property="og:url" content="https://lifeguard-radar.vercel.app">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛟</text></svg>">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
@@ -1160,6 +1160,11 @@ function showToast(msg,type=''){
 function toast(msg,type){ showToast(msg,type); }
 
 /* ══ INIT ══ */
+// Console 彩蛋
+console.log('%c그대로 멈춰 거기 Stop', 'font-size:18px;font-weight:bold;color:#06b6d4;');
+console.log('%cBuilt with ❤️ by 中和禹智皓', 'color:#888;font-size:12px;');
+console.log('%c그대로 멈춰 거기 Stop', 'font-size:18px;font-weight:bold;color:#06b6d4;');
+console.log('%cBlock B (블락비) · 2011 · Built with ❤️ by a ZICO fan', 'color:#888;font-size:12px;');
 // 語言：優先用 localStorage，其次偵測系統語言
 const savedLang = localStorage.getItem('lang');
 const sysLang = navigator.language || navigator.userLanguage || 'zh';
@@ -1249,5 +1254,104 @@ map.whenReady(()=>{
 </script>
 <!-- 隱私權政策靜態連結（供 Google 爬蟲索引） -->
 <a href="/privacy" style="display:none;" aria-hidden="true">隱私權政策 Privacy Policy</a>
+<!-- 🎤 Easter Egg -->
+<div id="easter-egg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);
+  z-index:9999;align-items:center;justify-content:center;flex-direction:column;
+  font-family:'Noto Sans TC',sans-serif;color:#fff;text-align:center;cursor:pointer;"
+  onclick="document.getElementById('easter-egg').style.display='none'">
+  <div style="font-size:13px;letter-spacing:.2em;color:#aaa;margin-bottom:24px;text-transform:uppercase;">Block B · 2011</div>
+  <div style="font-size:clamp(28px,6vw,56px);font-weight:900;letter-spacing:.05em;line-height:1.3;
+    background:linear-gradient(135deg,#06b6d4,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+    그대로 멈춰<br>거기 stop
+  </div>
+  <div style="font-size:14px;color:#888;margin-top:28px;max-width:320px;line-height:1.8;">
+    그냥 거기 멈춰줘<br>
+    <span style="font-size:12px;color:#555;">Just stop right there</span>
+  </div>
+  <div style="font-size:11px;color:#444;margin-top:48px;">Built with ❤️ by a ZICO & Block B fan<br>— 停止救生員產業的低劣就業環境 —</div>
+  <div style="font-size:11px;color:#333;margin-top:16px;">點擊任意處關閉</div>
+</div>
+
+<script>
+// Konami Code: ↑↑↓↓←→←→BA
+(function(){
+  const code = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+  let idx = 0;
+  document.addEventListener('keydown', e => {
+    if(e.key === code[idx]) {
+      idx++;
+      if(idx === code.length){
+        document.getElementById('easter-egg').style.display='flex';
+        idx = 0;
+      }
+    } else {
+      idx = e.key === code[0] ? 1 : 0;
+    }
+  });
+})();
+</script>
+
+<!-- ── 彩蛋 ── -->
+<div onclick="openOv('ov-egg')"
+  style="position:fixed;bottom:4px;left:50%;transform:translateX(-50%);z-index:999;
+    font-size:10px;color:var(--text-muted);opacity:0.5;cursor:pointer;white-space:nowrap;
+    transition:opacity .2s;letter-spacing:.04em;"
+  onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='.5'">
+  그대로 멈춰 거기 Stop!
+</div>
+
+<div class="overlay" id="ov-egg" onclick="if(event.target.id==='ov-egg')closeOv('ov-egg')">
+  <div style="
+    position:relative;max-width:440px;width:100%;
+    background:#0a0a0a;border-radius:4px;overflow:hidden;
+    box-shadow:0 30px 80px rgba(0,0,0,.9);
+    animation:slideUp .22s ease;
+  ">
+    <!-- 點狀背景 -->
+    <div style="
+      position:absolute;inset:0;
+      background-image:radial-gradient(circle, #2a2a2a 1px, transparent 1px);
+      background-size:10px 10px;
+      opacity:0.9;
+    "></div>
+    <!-- 漸層覆蓋 -->
+    <div style="
+      position:absolute;inset:0;
+      background:radial-gradient(ellipse at center, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.85) 100%);
+    "></div>
+
+    <!-- 內容 -->
+    <div style="position:relative;z-index:1;padding:56px 44px 52px;text-align:center;">
+      <button onclick="closeOv('ov-egg')"
+        style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,.08);
+          border:1px solid rgba(255,255,255,.15);border-radius:6px;color:#aaa;
+          cursor:pointer;width:28px;height:28px;font-size:14px;display:flex;
+          align-items:center;justify-content:center;">✕</button>
+
+      <!-- 主歌詞 -->
+      <div style="
+        font-size:40px;font-weight:900;letter-spacing:-.01em;line-height:1.25;
+        color:#c8c8c8;
+        text-shadow:0 0 40px rgba(200,200,200,.15);
+        margin-bottom:32px;
+        font-family:'Noto Sans TC','PingFang TC',sans-serif;
+      ">그대로 멈춰 거기 Stop!</div>
+
+      <!-- 分隔 -->
+      <div style="width:36px;height:1px;background:rgba(200,200,200,.3);margin:0 auto 28px;"></div>
+
+      <!-- 口號 -->
+      <div style="
+        font-size:13px;letter-spacing:.12em;color:#888;
+        font-family:'Noto Sans TC','PingFang TC',sans-serif;
+        line-height:1.8;
+      ">
+        停止救生員的低劣就業環境！<br>
+        <span style="font-size:11px;opacity:.6;letter-spacing:.06em;">Built with ❤️ by 中和禹智皓</span>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
