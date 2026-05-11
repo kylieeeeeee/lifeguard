@@ -43,6 +43,10 @@ body{font-family:'Noto Sans TC','PingFang TC',sans-serif;background:var(--bg);co
 .logo-text{font-size:17px;font-weight:900;color:var(--text);letter-spacing:-.02em;min-width:160px;}
 .topbar-right{pointer-events:all;display:flex;align-items:center;gap:6px;flex-shrink:0;}
 .topbar-tools{pointer-events:all;display:flex;align-items:center;gap:6px;}
+
+@media(max-width:600px){
+  #egg-text{ bottom:72px!important; }
+}
 .theme-toggle{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;height:32px;}
 .tbtn{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:0 10px;font-size:13px;line-height:1;transition:all .15s;height:100%;display:flex;align-items:center;justify-content:center;}
 .tbtn.active{background:var(--accent);color:#fff;}
@@ -1290,7 +1294,7 @@ loadReports();
 </script>
 
 <!-- ── 彩蛋 ── -->
-<div onclick="openOv('ov-egg')"
+<div id="egg-text" onclick="openOv('ov-egg')"
   style="position:fixed;bottom:calc(env(safe-area-inset-bottom, 4px) + 4px);left:50%;transform:translateX(-50%);z-index:999;
     font-size:10px;color:var(--text-muted);opacity:0.5;cursor:pointer;white-space:nowrap;
     transition:opacity .2s;letter-spacing:.04em;"
