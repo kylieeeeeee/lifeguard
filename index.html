@@ -185,7 +185,8 @@ textarea.finput{resize:vertical;min-height:75px;}
 .leaflet-popup-content-wrapper{background:var(--popup-bg)!important;border:1px solid var(--popup-border)!important;
   border-radius:14px!important;box-shadow:0 12px 40px var(--shadow)!important;color:var(--text)!important;padding:0!important;}
 .leaflet-popup{z-index:1100!important;}
-.leaflet-popup-tip-container{display:none!important;}
+.leaflet-popup-pane{z-index:1100!important;}
+.leaflet-tip-container,.leaflet-popup-tip-container{display:none!important;}
 .leaflet-popup-content{margin:0!important;min-width:260px;}
 .popup-head{padding:14px 16px 10px;}
 .popup-name{font-size:15px;font-weight:900;color:var(--text);margin-bottom:2px;}
@@ -1276,7 +1277,12 @@ function alignActionBtn(){
   btn.style.top=zr.top+(zr.height-br.height)/2+'px';
   btn.style.bottom='auto';
 }
-map.whenReady(()=>{ setTimeout(alignActionBtn,100); });
+map.whenReady(()=>{
+  setTimeout(alignActionBtn,100);
+  // popup pane 蓋過所有 UI
+  const pane = map.getPane('popupPane');
+  if(pane) pane.style.zIndex = '1100';
+});
 window.addEventListener('resize',alignActionBtn);
 
 // 載入已審核回報 + 等地圖 ready
