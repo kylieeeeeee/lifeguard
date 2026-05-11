@@ -805,7 +805,16 @@ function changeSort(pid, mode){
 function openPopup(pid,idx){
   popOpenPid=pid;
   popIdx=idx;
-  document.querySelector('.legend').style.zIndex='500';
+  // 只在手機上隱藏遮擋元素
+  if(window.innerWidth <= 640){
+    document.querySelector('.legend').style.visibility='hidden';
+    document.getElementById('action-btn').style.visibility='hidden';
+    document.querySelector('.topbar').style.background='transparent';
+    document.getElementById('venue-search-wrap').style.visibility='hidden';
+    document.querySelector('.stat-card').style.visibility='hidden';
+    const logout=document.getElementById('logout-btn');
+    if(logout) logout.style.visibility='hidden';
+  }
   const mk=markers.get(pid);
   if(!mk) return;
   mk.setPopupContent(popHTML(pid,idx));
@@ -847,6 +856,13 @@ function addRowToMap(row){
     mk.on('click',()=>openPopup(pid,0));
     mk.on('popupclose',()=>{ 
       popOpenPid=null;
+      document.querySelector('.legend').style.visibility='';
+      document.getElementById('action-btn').style.visibility='';
+      document.querySelector('.topbar').style.background='';
+      document.getElementById('venue-search-wrap').style.visibility='';
+      document.querySelector('.stat-card').style.visibility='';
+      const logout=document.getElementById('logout-btn');
+      if(logout) logout.style.visibility='';
       document.querySelector('.legend').style.zIndex='1000';
     });
     markers.set(pid,mk);
