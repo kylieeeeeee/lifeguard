@@ -62,6 +62,7 @@ body{font-family:'Noto Sans TC','PingFang TC',sans-serif;background:var(--bg);co
 .logout-btn:hover{border-color:#dc2626;color:#dc2626;}
 .legend{position:absolute;bottom:30px;left:16px;z-index:1000;
   background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;}
+.legend-body{display:block;}
 .legend-title{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px;}
 .legend-item{display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:5px;color:var(--text);}
 .legend-item:last-child{margin-bottom:0;}
@@ -240,13 +241,15 @@ textarea.finput{resize:vertical;min-height:75px;}
   </div>
 </div>
 
-<div class="legend">
+<div class="legend" onclick="this.classList.toggle('open')">
   <div class="legend-title" data-i18n="legend-title">避雷評分</div>
-  <div class="legend-item"><div class="ldot" style="background:#dc2626"></div><span data-i18n="r1">1 超雷</span></div>
-  <div class="legend-item"><div class="ldot" style="background:#ea580c"></div><span data-i18n="r2">2 偏雷</span></div>
-  <div class="legend-item"><div class="ldot" style="background:#ca8a04"></div><span data-i18n="r3">3 普通</span></div>
-  <div class="legend-item"><div class="ldot" style="background:#16a34a"></div><span data-i18n="r4">4 不錯</span></div>
-  <div class="legend-item"><div class="ldot" style="background:#06b6d4"></div><span data-i18n="r5">5 超推</span></div>
+  <div class="legend-body">
+    <div class="legend-item"><div class="ldot" style="background:#dc2626"></div><span data-i18n="r1">1 超雷</span></div>
+    <div class="legend-item"><div class="ldot" style="background:#ea580c"></div><span data-i18n="r2">2 偏雷</span></div>
+    <div class="legend-item"><div class="ldot" style="background:#ca8a04"></div><span data-i18n="r3">3 普通</span></div>
+    <div class="legend-item"><div class="ldot" style="background:#16a34a"></div><span data-i18n="r4">4 不錯</span></div>
+    <div class="legend-item"><div class="ldot" style="background:#06b6d4"></div><span data-i18n="r5">5 超推</span></div>
+  </div>
 </div>
 
 <button class="action-btn" id="action-btn" onclick="handleUserBtn()">
@@ -785,6 +788,7 @@ function changeSort(pid, mode){
 function openPopup(pid,idx){
   popOpenPid=pid;
   popIdx=idx;
+  document.querySelector('.legend').style.zIndex='500';
   const mk=markers.get(pid);
   if(!mk) return;
   mk.setPopupContent(popHTML(pid,idx));
@@ -824,7 +828,10 @@ function addRowToMap(row){
     const mk=L.marker([v.lat,v.lon],{icon:mkIcon(v.reports)}).addTo(map);
     mk.bindPopup('',{maxWidth:300});
     mk.on('click',()=>openPopup(pid,0));
-    mk.on('popupclose',()=>{ popOpenPid=null; });
+    mk.on('popupclose',()=>{ 
+      popOpenPid=null;
+      document.querySelector('.legend').style.zIndex='1000';
+    });
     markers.set(pid,mk);
   }
   updateStats();
@@ -1301,7 +1308,7 @@ loadReports();
 <!-- ── 彩蛋 ── -->
 <div id="egg-text" onclick="openOv('ov-egg')"
   style="position:fixed;top:4px;left:50%;transform:translateX(-50%);z-index:999;
-    font-size:10px;color:var(--text-muted);opacity:0.5;cursor:pointer;white-space:nowrap;
+    font-size:10px;color:var(--text-muted);opacity:0.9;cursor:pointer;white-space:nowrap;
     transition:opacity .2s;letter-spacing:.04em;"
   onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='.5'">
   그대로 멈춰 거기 Stop!
