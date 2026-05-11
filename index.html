@@ -44,8 +44,11 @@ body{font-family:'Noto Sans TC','PingFang TC',sans-serif;background:var(--bg);co
 .topbar-right{pointer-events:all;display:flex;align-items:center;gap:6px;flex-shrink:0;}
 .topbar-tools{pointer-events:all;display:flex;align-items:center;gap:6px;}
 
-@media(max-width:600px){
-  #egg-text{ bottom:72px!important; }
+@media(max-width:640px){
+  .logo-text{display:none;}
+  .topbar-right{flex-shrink:0;flex-wrap:nowrap;gap:6px;}
+  .topbar-tools{gap:6px;}
+  #venue-search{width:90px!important;}
 }
 .theme-toggle{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;height:32px;}
 .tbtn{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:0 10px;font-size:13px;line-height:1;transition:all .15s;height:100%;display:flex;align-items:center;justify-content:center;}
@@ -213,25 +216,27 @@ textarea.finput{resize:vertical;min-height:75px;}
       <button class="tbtn" id="btn-zh" onclick="setLang('zh')">中</button>
       <button class="tbtn" id="btn-en" onclick="setLang('en')">EN</button>
     </div>
-    <div style="position:relative;" id="venue-search-wrap">
-      <input id="venue-search" type="text" autocomplete="off"
-        placeholder="搜尋場館…"
-        oninput="onVenueSearch()" onfocus="onVenueSearch()"
-        style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;
-          height:32px;padding:0 10px;font-family:inherit;font-size:13px;color:var(--text);
-          outline:none;width:140px;transition:width .2s,border-color .15s;"
-        onfocusin="this.style.width='200px';this.style.borderColor='var(--accent)'"
-        onfocusout="this.style.width='140px';this.style.borderColor='var(--border)'">
-      <div id="venue-search-drop" style="display:none;position:absolute;top:calc(100% + 4px);right:0;
-        min-width:220px;background:var(--surface);border:1px solid var(--border);border-radius:10px;
-        overflow:hidden;box-shadow:0 8px 24px var(--shadow);z-index:1100;max-height:260px;overflow-y:auto;">
+    <div class="topbar-tools">
+      <div style="position:relative;" id="venue-search-wrap">
+        <input id="venue-search" type="text" autocomplete="off"
+          placeholder="搜尋場館…"
+          oninput="onVenueSearch()" onfocus="onVenueSearch()"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+            height:32px;padding:0 10px;font-family:inherit;font-size:13px;color:var(--text);
+            outline:none;width:140px;transition:width .2s,border-color .15s;"
+          onfocusin="this.style.width='200px';this.style.borderColor='var(--accent)'"
+          onfocusout="this.style.width='140px';this.style.borderColor='var(--border)'">
+        <div id="venue-search-drop" style="display:none;position:absolute;top:calc(100% + 4px);right:0;
+          min-width:220px;background:var(--surface);border:1px solid var(--border);border-radius:10px;
+          overflow:hidden;box-shadow:0 8px 24px var(--shadow);z-index:1100;max-height:260px;overflow-y:auto;">
+        </div>
       </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-total">0</div>
+        <div class="stat-label" data-i18n="stat-label">總回報數</div>
+      </div>
+      <button class="logout-btn" id="logout-btn" onclick="logout()" data-i18n="logout">登出</button>
     </div>
-    <div class="stat-card">
-      <div class="stat-num" id="stat-total">0</div>
-      <div class="stat-label" data-i18n="stat-label">總回報數</div>
-    </div>
-    <button class="logout-btn" id="logout-btn" onclick="logout()" data-i18n="logout">登出</button>
   </div>
 </div>
 
@@ -1295,7 +1300,7 @@ loadReports();
 
 <!-- ── 彩蛋 ── -->
 <div id="egg-text" onclick="openOv('ov-egg')"
-  style="position:fixed;bottom:calc(env(safe-area-inset-bottom, 4px) + 4px);left:50%;transform:translateX(-50%);z-index:999;
+  style="position:fixed;top:4px;left:50%;transform:translateX(-50%);z-index:999;
     font-size:10px;color:var(--text-muted);opacity:0.5;cursor:pointer;white-space:nowrap;
     transition:opacity .2s;letter-spacing:.04em;"
   onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='.5'">
