@@ -184,6 +184,7 @@ textarea.finput{resize:vertical;min-height:75px;}
 .toast.show{transform:translateY(0);opacity:1;}
 .leaflet-popup-content-wrapper{background:var(--popup-bg)!important;border:1px solid var(--popup-border)!important;
   border-radius:14px!important;box-shadow:0 12px 40px var(--shadow)!important;color:var(--text)!important;padding:0!important;}
+.leaflet-popup{z-index:1100!important;}
 .leaflet-popup-tip-container{display:none!important;}
 .leaflet-popup-content{margin:0!important;min-width:260px;}
 .popup-head{padding:14px 16px 10px;}
@@ -1322,8 +1323,8 @@ loadReports();
 
 <!-- ── 彩蛋 ── -->
 <div id="egg-text" onclick="openOv('ov-egg')"
-  style="position:fixed;top:4px;left:50%;transform:translateX(-50%);z-index:999;
-    font-size:10px;color:#1a2e42;opacity:0.9;cursor:pointer;white-space:nowrap;
+  style="position:fixed;top:4px;left:50%;transform:translateX(-50%);z-index:1001;
+    font-size:10px;color:#1a2e42;opacity:0.5;cursor:pointer;white-space:nowrap;
     transition:opacity .2s;letter-spacing:.04em;"
   onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='.5'">
   그대로 멈춰 거기 Stop!
