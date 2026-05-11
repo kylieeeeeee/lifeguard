@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>隱私權政策 | 救生員避雷地圖</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛟</text></svg>">
+<link rel="icon" href="/logo.svg">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
@@ -37,6 +37,12 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
   color:var(--text-muted);padding:0 12px;font-size:12px;font-weight:600;
   font-family:inherit;height:32px;text-decoration:none;display:flex;align-items:center;white-space:nowrap;transition:all .15s;}
 .back-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+@media(max-width:640px){
+  .logo-text{display:none;}
+  .back-btn-text{display:none;}
+  .back-btn{padding:0 10px;font-size:14px;}
+}
 
 main{max-width:720px;margin:0 auto;padding:40px 24px 80px;}
 h1{font-size:22px;font-weight:900;color:var(--accent);margin-bottom:6px;}
@@ -109,7 +115,7 @@ textarea.finput{resize:vertical;min-height:90px;}
 
 <header>
   <a class="logo" href="/">
-    <div class="logo-mark">🛟</div>
+    <img class="logo-mark" src="/logo.svg" alt="logo" style="width:32px;height:32px;">
     <div class="logo-text" id="logo-text">救生員避雷地圖</div>
   </a>
   <div class="header-right">
@@ -117,7 +123,7 @@ textarea.finput{resize:vertical;min-height:90px;}
       <button class="tbtn" id="btn-zh" onclick="setLang('zh')">中</button>
       <button class="tbtn" id="btn-en" onclick="setLang('en')">EN</button>
     </div>
-    <a class="back-btn" href="/" id="back-btn">← 返回地圖</a>
+    <a class="back-btn" href="/" id="back-btn">← <span class="back-btn-text" id="back-btn-text">返回地圖</span></a>
   </div>
 </header>
 
@@ -200,7 +206,7 @@ textarea.finput{resize:vertical;min-height:90px;}
       <div class="modal-title" id="login-title">登入後才能聯絡管理員</div>
       <button class="close" onclick="closeOv('ov-login')">✕</button>
     </div>
-    <div class="login-logo"><span class="big-emoji">🛟</span></div>
+    <div class="login-logo"><img src="/logo.svg" alt="logo" style="width:72px;height:72px;display:block;margin:0 auto 8px;"></div>
     <div class="login-desc" id="login-desc">請先使用 Google 帳號登入，才能送出訊息給管理員。</div>
     <button class="google-btn" onclick="loginWithGoogle()">
       <svg class="gicon" viewBox="0 0 48 48">
@@ -254,7 +260,7 @@ let lang = 'zh';
 const DICT = {
   zh:{
     'logo-text':'救生員避雷地圖',
-    'back-btn':'← 返回地圖',
+    'back-btn':'返回地圖',
     'page-title':'隱私權政策與服務條款',
     'updated':'最後更新：2026 年 5 月',
     'privacy-title':'一、隱私權政策',
@@ -299,7 +305,7 @@ const DICT = {
   },
   en:{
     'logo-text':'LIFEGUARD RADAR',
-    'back-btn':'← Back to Map',
+    'back-btn':'Back to Map',
     'page-title':'Privacy Policy & Terms of Service',
     'updated':'Last updated: May 2026',
     'privacy-title':'I. Privacy Policy',
@@ -356,6 +362,11 @@ function setLang(l){
   Object.keys(DICT.zh).forEach(key=>{
     const el = document.getElementById(key);
     if(!el) return;
+    if(key==='back-btn'){
+      const span = document.getElementById('back-btn-text');
+      if(span) span.textContent = t(key);
+      return;
+    }
     if(el.tagName==='UL') el.innerHTML = t(key);
     else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') el.placeholder = t(key);
     else el.innerHTML = t(key);
