@@ -810,7 +810,6 @@ function openPopup(pid,idx){
   // 只在手機上隱藏其他遮擋元素
   if(window.innerWidth <= 640){
     document.querySelector('.legend').style.visibility='hidden';
-    document.getElementById('action-btn').style.visibility='hidden';
     document.getElementById('venue-search-wrap').style.visibility='hidden';
     document.querySelector('.stat-card').style.visibility='hidden';
     const logout=document.getElementById('logout-btn');
@@ -858,7 +857,6 @@ function addRowToMap(row){
     mk.on('popupclose',()=>{ 
       popOpenPid=null;
       document.querySelector('.legend').style.visibility='';
-      document.getElementById('action-btn').style.visibility='';
       document.querySelector('.topbar').style.background='';
       document.getElementById('venue-search-wrap').style.visibility='';
       document.querySelector('.stat-card').style.visibility='';
@@ -1220,7 +1218,6 @@ function toast(msg,type){ showToast(msg,type); }
 // Console 彩蛋
 console.log('%c그대로 멈춰 거기 Stop', 'font-size:18px;font-weight:bold;color:#06b6d4;');
 console.log('%cBuilt by 中和雞鴨扣σ`∀´)σ', 'color:#888;font-size:12px;');
-console.log('%cBlock B (블락비) · 2011 · Built with ❤️ by a ZICO fan', 'color:#888;font-size:12px;');
 // 語言：優先用 localStorage，其次偵測系統語言
 const savedLang = localStorage.getItem('lang');
 const sysLang = navigator.language || navigator.userLanguage || 'zh';
