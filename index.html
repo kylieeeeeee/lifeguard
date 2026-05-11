@@ -479,6 +479,8 @@ const DICT = {
     'user-label-pre':'登入後回報','user-label-post':'立即回報',
     'login-title':'登入後才能回報',
     'login-desc':'登入後才能提交回報。<br>每個帳號每個場館只能回報一次。<br>若需修改請聯絡管理員。',
+    'login-title-contact':'登入後才能聯絡管理員',
+    'login-desc-contact':'請先使用 Google 帳號登入，才能送出訊息給管理員。',
     'google-login':'使用 Google 帳號登入',
     'report-title':'場館工作內容回報',
     'venue-label':'場館名稱或地址',
@@ -542,6 +544,8 @@ const DICT = {
     'user-label-pre':'Sign in to Report','user-label-post':'Submit Report',
     'login-title':'Sign in to Submit',
     'login-desc':'Sign in to submit a report.<br>One report per venue per account.<br>Contact admin to make changes.',
+    'login-title-contact':'Sign in to Contact Admin',
+    'login-desc-contact':'Please sign in with your Google account to send a message to the admin.',
     'google-login':'Sign in with Google',
     'report-title':'Venue Work Report',
     'venue-label':'Venue Name or Address',
@@ -878,7 +882,12 @@ async function loadReports(){
 
 /* ══ AUTH ══ */
 function handleUserBtn(){
-  if(user) tryReport(); else openOv('ov-login');
+  if(user) tryReport();
+  else {
+    document.querySelector('#ov-login .modal-title').textContent = t('login-title');
+    document.querySelector('#ov-login .login-desc').innerHTML = t('login-desc');
+    openOv('ov-login');
+  }
 }
 
 async function loginWithGoogle(){
@@ -1071,7 +1080,11 @@ async function checkDup(){
 
 /* ══ REPORT FLOW ══ */
 function tryReport(){
-  if(!user){ openOv('ov-login'); return; }
+  if(!user){
+    document.querySelector('#ov-login .modal-title').textContent = t('login-title');
+    document.querySelector('#ov-login .login-desc').innerHTML = t('login-desc');
+    openOv('ov-login'); return;
+  }
   document.getElementById('report-sub').textContent=t('report-by')+user.name;
   openOv('ov-report');
 }
@@ -1166,7 +1179,13 @@ function updateStats(){
 /* ══ CONTACT ══ */
 let contactPid=null, contactReportId=null;
 function openContact(pid, idx){
-  if(!user){ openOv('ov-login'); return; }
+  if(!user){
+    // 換成聯絡管理員專用的登入提示
+    document.querySelector('#ov-login .modal-title').textContent = t('login-title-contact');
+    document.querySelector('#ov-login .login-desc').innerHTML = t('login-desc-contact');
+    openOv('ov-login');
+    return;
+  }
   const v=pid?venues.get(pid):null;
   const r=v?.reports[idx];
   contactPid=pid;
