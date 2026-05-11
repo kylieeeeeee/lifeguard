@@ -3,14 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="google-site-verification" content="HKfPQ4unVO5GiguucltNgjzSFT_qMMONNILzva05o1Q" />
-<title>救生員避雷地圖</title>
-<meta name="application-name" content="救生員避雷地圖">
-<meta property="og:title" content="救生員避雷地圖">
-<meta property="og:site_name" content="救生員避雷地圖">
-<meta property="og:description" content="全國的救生員們，來這裡分享你的工作心得吧！">
-<meta property="og:url" content="https://lifeguard-radar.vercel.app">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛟</text></svg>">
+<title>救生員避雷地圖 Lifeguard Radar</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <!-- ★ Supabase SDK ★ -->
@@ -34,25 +27,23 @@
 }
 html,body{height:100%;overflow:hidden;}
 body{font-family:'Noto Sans TC','PingFang TC',sans-serif;background:var(--bg);color:var(--text);}
-#map{width:100%;height:100dvh;}
+#map{width:100%;height:100vh;}
 .topbar{position:absolute;top:0;left:0;right:0;z-index:1000;
   background:linear-gradient(180deg,var(--topbar) 0%,transparent 100%);
-  padding:12px 16px 48px;display:flex;align-items:center;justify-content:space-between;pointer-events:none;}
-.logo{pointer-events:all;display:flex;align-items:center;gap:10px;}
-.logo-mark{font-size:28px;line-height:1;display:flex;align-items:center;}
-.logo-text{font-size:17px;font-weight:900;color:var(--text);letter-spacing:-.02em;min-width:160px;}
-.topbar-right{pointer-events:all;display:flex;align-items:center;gap:6px;flex-shrink:0;}
-.theme-toggle{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;height:32px;}
-.tbtn{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:0 10px;font-size:13px;line-height:1;transition:all .15s;height:100%;display:flex;align-items:center;justify-content:center;}
+  padding:16px 20px 48px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;}
+.logo{pointer-events:all;display:flex;align-items:center;gap:12px;}
+.logo-mark{width:42px;height:42px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 0 20px var(--accent-glow);}
+.logo-text{font-size:17px;font-weight:900;color:var(--text);letter-spacing:-.02em;}
+.logo-sub{font-size:10px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-top:2px;}
+.topbar-right{pointer-events:all;display:flex;align-items:center;gap:8px;}
+.theme-toggle{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.tbtn{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:7px 10px;font-size:13px;transition:all .15s;}
 .tbtn.active{background:var(--accent);color:#fff;}
 .stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 14px;text-align:center;}
 .stat-num{font-size:20px;font-weight:900;color:var(--accent);line-height:1;}
 .stat-label{font-size:10px;color:var(--text-muted);margin-top:2px;}
-.logout-btn{display:none;background:var(--surface2);border:1px solid var(--border);border-radius:8px;
-  color:var(--text-muted);cursor:pointer;padding:7px 12px;font-size:12px;font-weight:600;
-  font-family:inherit;transition:all .15s;}
-.logout-btn:hover{border-color:#dc2626;color:#dc2626;}
-.legend{position:absolute;bottom:30px;left:16px;z-index:1000;
+.legend{position:absolute;bottom:30px;left:18px;z-index:1000;
   background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;}
 .legend-title{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px;}
 .legend-item{display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:5px;color:var(--text);}
@@ -146,7 +137,7 @@ textarea.finput{resize:vertical;min-height:75px;}
 .c-row span{color:var(--text);font-weight:600;text-align:right;max-width:58%;}
 .c-comment{font-size:12px;color:var(--text-muted);margin-top:8px;padding-top:8px;
   border-top:1px solid var(--border);line-height:1.6;font-style:italic;}
-.confirm-notice{font-size:11px;color:#dc2626;text-align:center;margin-bottom:14px;line-height:1.6;font-weight:600;}
+.confirm-notice{font-size:11px;color:var(--text-muted);text-align:center;margin-bottom:14px;line-height:1.6;}
 .confirm-btns{display:flex;gap:8px;}
 .btn-back{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;
   padding:12px;font-family:inherit;font-size:14px;font-weight:700;color:var(--text);cursor:pointer;}
@@ -185,8 +176,7 @@ textarea.finput{resize:vertical;min-height:75px;}
   border-top:1px solid var(--popup-border);line-height:1.6;}
 .popup-mod{font-size:11px;color:var(--text-muted);margin-top:10px;padding-top:9px;
   border-top:1px solid var(--popup-border);text-align:center;}
-.popup-mod a{color:var(--accent);text-decoration:none;cursor:pointer;}
-.contact-modal{max-width:420px;}
+.popup-mod a{color:var(--accent);text-decoration:none;}
 </style>
 </head>
 <body>
@@ -196,7 +186,8 @@ textarea.finput{resize:vertical;min-height:75px;}
   <div class="logo">
     <div class="logo-mark">🛟</div>
     <div>
-      <div class="logo-text" data-i18n="logo-text">救生員避雷地圖</div>
+      <div class="logo-text">救生員避雷地圖</div>
+      <div class="logo-sub">Lifeguard Radar</div>
     </div>
   </div>
   <div class="topbar-right">
@@ -204,40 +195,20 @@ textarea.finput{resize:vertical;min-height:75px;}
       <button class="tbtn" id="btn-light" onclick="setTheme('light')" title="淺色">☀️</button>
       <button class="tbtn" id="btn-dark"  onclick="setTheme('dark')"  title="深色">🌙</button>
     </div>
-    <div class="theme-toggle">
-      <button class="tbtn" id="btn-zh" onclick="setLang('zh')">中</button>
-      <button class="tbtn" id="btn-en" onclick="setLang('en')">EN</button>
-    </div>
-    <!-- 搜尋場館 -->
-    <div style="position:relative;" id="venue-search-wrap">
-      <input id="venue-search" type="text" autocomplete="off"
-        placeholder="搜尋場館…"
-        oninput="onVenueSearch()" onfocus="onVenueSearch()"
-        style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;
-          height:32px;padding:0 10px;font-family:inherit;font-size:13px;color:var(--text);
-          outline:none;width:140px;transition:width .2s,border-color .15s;"
-        onfocusin="this.style.width='200px';this.style.borderColor='var(--accent)'"
-        onfocusout="this.style.width='140px';this.style.borderColor='var(--border)'">
-      <div id="venue-search-drop" style="display:none;position:absolute;top:calc(100% + 4px);right:0;
-        min-width:220px;background:var(--surface);border:1px solid var(--border);border-radius:10px;
-        overflow:hidden;box-shadow:0 8px 24px var(--shadow);z-index:1100;max-height:260px;overflow-y:auto;">
-      </div>
-    </div>
     <div class="stat-card">
       <div class="stat-num" id="stat-total">0</div>
-      <div class="stat-label" data-i18n="stat-label">總回報數</div>
+      <div class="stat-label">總回報數</div>
     </div>
-    <button class="logout-btn" id="logout-btn" onclick="logout()" data-i18n="logout">登出</button>
   </div>
 </div>
 
 <div class="legend">
-  <div class="legend-title" data-i18n="legend-title">避雷評分</div>
-  <div class="legend-item"><div class="ldot" style="background:#dc2626"></div><span data-i18n="r1">1 超雷</span></div>
-  <div class="legend-item"><div class="ldot" style="background:#ea580c"></div><span data-i18n="r2">2 偏雷</span></div>
-  <div class="legend-item"><div class="ldot" style="background:#ca8a04"></div><span data-i18n="r3">3 普通</span></div>
-  <div class="legend-item"><div class="ldot" style="background:#16a34a"></div><span data-i18n="r4">4 不錯</span></div>
-  <div class="legend-item"><div class="ldot" style="background:#06b6d4"></div><span data-i18n="r5">5 超推</span></div>
+  <div class="legend-title">避雷評分</div>
+  <div class="legend-item"><div class="ldot" style="background:#dc2626"></div>1 超雷</div>
+  <div class="legend-item"><div class="ldot" style="background:#ea580c"></div>2 偏雷</div>
+  <div class="legend-item"><div class="ldot" style="background:#ca8a04"></div>3 普通</div>
+  <div class="legend-item"><div class="ldot" style="background:#16a34a"></div>4 不錯</div>
+  <div class="legend-item"><div class="ldot" style="background:#06b6d4"></div>5 超推</div>
 </div>
 
 <button class="action-btn" id="action-btn" onclick="handleUserBtn()">
@@ -248,11 +219,11 @@ textarea.finput{resize:vertical;min-height:75px;}
 <div class="overlay" id="ov-login" onclick="ovClick(event,'ov-login')">
   <div class="modal login-modal">
     <div class="modal-head">
-      <div><div class="modal-title" data-i18n="login-title">登入後才能回報</div></div>
+      <div><div class="modal-title">登入後才能回報</div></div>
       <button class="close" onclick="closeOv('ov-login')">✕</button>
     </div>
     <div class="login-logo"><span class="big-emoji">🛟</span></div>
-    <div class="login-desc" data-i18n="login-desc">
+    <div class="login-desc">
       登入後才能提交回報。<br>每個帳號每個場館只能回報一次。<br>若需修改請聯絡管理員。
     </div>
     <button class="google-btn" onclick="loginWithGoogle()">
@@ -262,7 +233,7 @@ textarea.finput{resize:vertical;min-height:75px;}
         <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.3 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8H6.3C9.6 35.7 16.3 44 24 44z"/>
         <path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l6.2 5.2C40.8 36.1 44 30.5 44 24c0-1.3-.1-2.6-.4-3.9z"/>
       </svg>
-      <span data-i18n="google-login">使用 Google 帳號登入</span>
+      使用 Google 帳號登入
     </button>
   </div>
 </div>
@@ -272,13 +243,13 @@ textarea.finput{resize:vertical;min-height:75px;}
   <div class="modal">
     <div class="modal-head">
       <div>
-        <div class="modal-title" data-i18n="report-title">場館工作內容回報</div>
+        <div class="modal-title">場館工作內容回報</div>
         <div class="modal-subtitle" id="report-sub">救生員避雷地圖</div>
       </div>
       <button class="close" onclick="closeOv('ov-report')">✕</button>
     </div>
     <div class="fg">
-      <label class="flabel"><span data-i18n="venue-label">場館名稱或地址</span><span class="req">*</span></label>
+      <label class="flabel">場館名稱或地址<span class="req">*</span></label>
       <div class="venue-wrap">
         <div id="v-locked" style="display:none" class="ac-locked">
           <div class="ac-locked-info">
@@ -293,48 +264,43 @@ textarea.finput{resize:vertical;min-height:75px;}
         <div class="ac-drop" id="ac-drop"></div>
       </div>
       <div class="ac-hint" id="v-hint"></div>
-      <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">
-        <span data-i18n="map-pick-hint">找不到場館？可直接在地圖上點選位置 →</span>
-        <button onclick="startMapPick()" style="background:none;border:none;color:var(--accent);
-          cursor:pointer;font-size:11px;font-weight:700;padding:0;font-family:inherit;" data-i18n="map-pick-btn">點這裡開啟地圖選點</button>
-      </div>
     </div>
     <div class="fdivider"></div>
     <div class="fg">
-      <label class="flabel"><span data-i18n="pay-label">給薪模式</span><span class="req">*</span></label>
+      <label class="flabel">給薪模式<span class="req">*</span></label>
       <div class="choice-group">
-        <label class="choice"><input type="radio" name="pay" value="時薪制"> <span data-i18n="pay-hourly">時薪制</span></label>
-        <label class="choice"><input type="radio" name="pay" value="月薪制"> <span data-i18n="pay-monthly">月薪制</span></label>
+        <label class="choice"><input type="radio" name="pay" value="時薪制"> 時薪制</label>
+        <label class="choice"><input type="radio" name="pay" value="月薪制"> 月薪制</label>
       </div>
     </div>
     <div class="fg">
-      <label class="flabel"><span data-i18n="salary-label">薪資水準</span><span class="req">*</span></label>
+      <label class="flabel">薪資水準<span class="req">*</span></label>
       <input id="f-salary" class="finput" type="text" placeholder="例：時薪 190，或月薪 36,000">
     </div>
     <div class="fdivider"></div>
     <div class="fg">
-      <label class="flabel"><span data-i18n="chores-label">是否需要負擔雜事</span><span class="req">*</span></label>
+      <label class="flabel">是否需要負擔雜事<span class="req">*</span></label>
       <div class="choice-group">
-        <label class="choice"><input type="checkbox" name="chores" value="無"> <span data-i18n="chore-none">無</span></label>
-        <label class="choice"><input type="checkbox" name="chores" value="清潔場地"> <span data-i18n="chore-clean">清潔場地</span></label>
-        <label class="choice"><input type="checkbox" name="chores" value="清潔廁所"> <span data-i18n="chore-toilet">清潔廁所</span></label>
-        <label class="choice"><input type="checkbox" name="chores" value="機房操作"> <span data-i18n="chore-pump">機房操作</span></label>
-        <label class="choice"><input type="checkbox" name="chores" value="加藥"> <span data-i18n="chore-drug">加藥</span></label>
-        <label class="choice"><input type="checkbox" name="chores" value="兼任櫃台"> <span data-i18n="chore-counter">兼任櫃台</span></label>
+        <label class="choice"><input type="checkbox" name="chores" value="無"> 無</label>
+        <label class="choice"><input type="checkbox" name="chores" value="清潔場地"> 清潔場地</label>
+        <label class="choice"><input type="checkbox" name="chores" value="清潔廁所"> 清潔廁所</label>
+        <label class="choice"><input type="checkbox" name="chores" value="機房操作"> 機房操作</label>
+        <label class="choice"><input type="checkbox" name="chores" value="加藥"> 加藥</label>
+        <label class="choice"><input type="checkbox" name="chores" value="兼任櫃台"> 兼任櫃台</label>
       </div>
       <input id="f-chores-other" class="finput" style="margin-top:7px" type="text" placeholder="其他雜事（選填）">
     </div>
     <div class="fg">
-      <label class="flabel"><span data-i18n="alone-label">是否常態性獨立當班</span><span class="req">*</span></label>
+      <label class="flabel">是否常態性獨立當班<span class="req">*</span></label>
       <div class="choice-group">
-        <label class="choice"><input type="radio" name="alone" value="是，常需獨自承擔風險"> <span data-i18n="alone-yes">是，常需獨自承擔風險</span></label>
-        <label class="choice"><input type="radio" name="alone" value="否，人力符合規定"> <span data-i18n="alone-no">否，人力符合規定</span></label>
+        <label class="choice"><input type="radio" name="alone" value="是，常需獨自承擔風險"> 是，常需獨自承擔風險</label>
+        <label class="choice"><input type="radio" name="alone" value="否，人力符合規定"> 否，人力符合規定</label>
       </div>
     </div>
     <div class="fdivider"></div>
     <div class="fg">
-      <label class="flabel"><span data-i18n="rating-label">整體避雷評分</span><span class="req">*</span></label>
-      <div class="rating-labels"><span data-i18n="rating-bad">⚡ 超雷</span><span></span><span data-i18n="rating-mid">普通</span><span></span><span data-i18n="rating-good">🏊 超推</span></div>
+      <label class="flabel">整體避雷評分<span class="req">*</span></label>
+      <div class="rating-labels"><span>⚡ 超雷</span><span></span><span>普通</span><span></span><span>🏊 超推</span></div>
       <div class="rating-row">
         <button class="rbtn" data-v="1" onclick="setRating(1)">1</button>
         <button class="rbtn" data-v="2" onclick="setRating(2)">2</button>
@@ -344,13 +310,10 @@ textarea.finput{resize:vertical;min-height:75px;}
       </div>
     </div>
     <div class="fg">
-      <label class="flabel" data-i18n="comment-label">血淚心得或推薦理由</label>
+      <label class="flabel">血淚心得或推薦理由</label>
       <textarea id="f-comment" class="finput" placeholder="分享工作體驗，幫助同業避雷！"></textarea>
     </div>
-    <label class="choice" style="margin-bottom:14px;">
-      <input type="checkbox" id="f-anon"> <span data-i18n="anon-label">匿名提交（不顯示你的名稱）</span>
-    </label>
-    <button class="submit" id="submit-btn" onclick="openConfirm()" data-i18n="submit-btn">確認送出</button>
+    <button class="submit" id="submit-btn" onclick="openConfirm()">確認送出</button>
   </div>
 </div>
 
@@ -359,7 +322,8 @@ textarea.finput{resize:vertical;min-height:75px;}
   <div class="modal confirm-modal">
     <div class="modal-head">
       <div>
-        <div class="modal-title" data-i18n="confirm-title">確認送出回報？</div>
+        <div class="modal-title">確認送出回報？</div>
+        <div class="modal-subtitle">送出後若需修改請聯絡管理員</div>
       </div>
       <button class="close" onclick="closeOv('ov-confirm')">✕</button>
     </div>
@@ -367,256 +331,35 @@ textarea.finput{resize:vertical;min-height:75px;}
       <div class="c-venue" id="c-name"></div>
       <div class="c-addr"  id="c-addr"></div>
       <div class="c-badge" id="c-badge"></div>
-      <div class="c-row"><span data-i18n="confirm-pay">給薪模式</span> <span id="c-pay"></span></div>
-      <div class="c-row"><span data-i18n="confirm-salary">薪資水準</span> <span id="c-salary"></span></div>
-      <div class="c-row"><span data-i18n="confirm-chores">雜事負擔</span> <span id="c-chores"></span></div>
-      <div class="c-row"><span data-i18n="confirm-alone">獨立當班</span> <span id="c-alone"></span></div>
+      <div class="c-row">給薪模式 <span id="c-pay"></span></div>
+      <div class="c-row">薪資水準 <span id="c-salary"></span></div>
+      <div class="c-row">雜事負擔 <span id="c-chores"></span></div>
+      <div class="c-row">獨立當班 <span id="c-alone"></span></div>
       <div class="c-comment" id="c-comment" style="display:none"></div>
     </div>
-    <div class="confirm-notice" data-i18n="confirm-notice">⚠️ 每個場館只能回報一次<br>送出後若需修改請聯絡管理員<br>送出後需待管理員審核才會顯示於地圖</div>
+    <div class="confirm-notice">⚠️ 每個場館只能回報一次<br>送出後若需修改請聯絡管理員<br>送出後需待管理員審核才會顯示於地圖</div>
     <div class="confirm-btns">
-      <button class="btn-back" onclick="closeOv('ov-confirm')" data-i18n="btn-back">← 返回修改</button>
-      <button class="btn-go" id="confirm-go" onclick="submitReport()" data-i18n="btn-go">確認送出</button>
+      <button class="btn-back" onclick="closeOv('ov-confirm')">← 返回修改</button>
+      <button class="btn-go" id="confirm-go" onclick="submitReport()">確認送出</button>
     </div>
-  </div>
-</div>
-
-<!-- CONTACT MODAL -->
-<div class="overlay" id="ov-contact" onclick="ovClick(event,'ov-contact')">
-  <div class="modal contact-modal">
-    <div class="modal-head">
-      <div>
-        <div class="modal-title" data-i18n="contact-title">聯絡管理員</div>
-      </div>
-      <button class="close" onclick="closeOv('ov-contact')">✕</button>
-    </div>
-    <div class="fg">
-      <label class="flabel"><span data-i18n="contact-reason-label">聯絡原因</span><span class="req">*</span></label>
-      <div class="choice-group">
-        <label class="choice"><input type="radio" name="contact-type" value="修改回報內容"> <span data-i18n="contact-r1">修改回報內容</span></label>
-        <label class="choice"><input type="radio" name="contact-type" value="刪除我的回報"> <span data-i18n="contact-r2">刪除我的回報</span></label>
-        <label class="choice"><input type="radio" name="contact-type" value="回報資訊有誤"> <span data-i18n="contact-r3">回報資訊有誤</span></label>
-        <label class="choice"><input type="radio" name="contact-type" value="其他問題"> <span data-i18n="contact-r4">其他問題</span></label>
-      </div>
-    </div>
-    <div class="fg">
-      <label class="flabel"><span data-i18n="contact-msg-label">說明內容</span><span class="req">*</span></label>
-      <textarea id="contact-msg" class="finput" placeholder="請描述你的問題或修改需求..." style="min-height:100px;"></textarea>
-    </div>
-    <button class="submit" id="contact-submit" onclick="submitContact()" data-i18n="contact-submit">送出</button>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<!-- MAP PICK HINT -->
-<div id="map-pick-hint" style="display:none;position:fixed;top:0;left:0;right:0;z-index:1500;
-  background:rgba(8,145,178,.92);color:#fff;padding:14px 20px;
-  align-items:center;justify-content:space-between;font-size:14px;font-weight:700;">
-  <span data-i18n="map-pick-bar">📍 點選地圖上的場館位置</span>
-  <button onclick="cancelMapPick()" style="background:rgba(255,255,255,.2);border:none;border-radius:8px;
-    color:#fff;padding:6px 14px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;" data-i18n="map-pick-cancel">取消</button>
-</div>
-
 <script>
 /* ════════════════════════════════════════
    ★ 填入你的 Supabase 資訊（只需改這兩行）★
 ════════════════════════════════════════ */
-const SUPABASE_URL  = 'https://euinsntybozxjhsddeqm.supabase.co';
-const SUPABASE_KEY  = 'sb_publishable_AbidJYNYkRcpXqj49kscCQ_VMWZlx2L';
-const GOOGLE_KEY    = 'AIzaSyCq0qDCSrGaH_RYEjc7g0Ny9UQ_12it65k';
+const SUPABASE_URL  = 'https://你的專案代號.supabase.co';
+const SUPABASE_KEY  = '你的 anon public key';
 /* ════════════════════════════════════════ */
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: {
-    flowType: 'pkce',
-    detectSessionInUrl: true,
-    persistSession: true
-  }
-});
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /* ══ CONSTANTS ══ */
 const C = {1:'#dc2626',2:'#ea580c',3:'#ca8a04',4:'#16a34a',5:'#06b6d4'};
-
-/* ══ I18N ══ */
-let lang = 'zh';
-const DICT = {
-  zh:{
-    'logo-text':'救生員避雷地圖',
-    'stat-label':'總回報數',
-    'logout':'登出',
-    'legend-title':'避雷評分',
-    'r1':'1 超雷','r2':'2 偏雷','r3':'3 普通','r4':'4 不錯','r5':'5 超推',
-    'user-label-pre':'登入後回報','user-label-post':'立即回報',
-    'login-title':'登入後才能回報',
-    'login-desc':'登入後才能提交回報。<br>每個帳號每個場館只能回報一次。<br>若需修改請聯絡管理員。',
-    'google-login':'使用 Google 帳號登入',
-    'report-title':'場館工作內容回報',
-    'venue-label':'場館名稱或地址',
-    'venue-placeholder':'搜尋場館名稱，例：南港運動中心',
-    'map-pick-hint':'找不到場館？可直接在地圖上點選位置 →',
-    'map-pick-btn':'點這裡開啟地圖選點',
-    'pay-label':'給薪模式',
-    'pay-hourly':'時薪制','pay-monthly':'月薪制',
-    'salary-label':'薪資水準',
-    'salary-placeholder':'例：時薪 190，或月薪 36,000',
-    'chores-label':'是否需要負擔雜事',
-    'chore-none':'無','chore-clean':'清潔場地','chore-toilet':'清潔廁所',
-    'chore-pump':'機房操作','chore-drug':'加藥','chore-counter':'兼任櫃台',
-    'chores-other-placeholder':'其他雜事（選填）',
-    'alone-label':'是否常態性獨立當班',
-    'alone-yes':'是，常需獨自承擔風險','alone-no':'否，人力符合規定',
-    'rating-label':'整體避雷評分',
-    'rating-bad':'⚡ 超雷','rating-good':'🏊 超推','rating-mid':'普通',
-    'comment-label':'血淚心得或推薦理由',
-    'comment-placeholder':'分享工作體驗，幫助同業避雷！',
-    'anon-label':'匿名提交（不顯示你的名稱）',
-    'submit-btn':'確認送出',
-    'confirm-title':'確認送出回報？',
-    'confirm-pay':'給薪模式','confirm-salary':'薪資水準',
-    'confirm-chores':'雜事負擔','confirm-alone':'獨立當班',
-    'confirm-notice':'⚠️ 每個場館只能回報一次<br>送出後若需修改請聯絡管理員<br>送出後需待管理員審核才會顯示於地圖',
-    'btn-back':'← 返回修改','btn-go':'確認送出',
-    'contact-title':'聯絡管理員',
-    'contact-reason-label':'聯絡原因',
-    'contact-r1':'修改回報內容','contact-r2':'刪除我的回報',
-    'contact-r3':'回報資訊有誤','contact-r4':'其他問題',
-    'contact-msg-label':'說明內容',
-    'contact-msg-placeholder':'請描述你的問題或修改需求...',
-    'contact-submit':'送出',
-    'map-pick-bar':'📍 點選地圖上的場館位置',
-    'map-pick-cancel':'取消',
-    'popup-pay':'💰 給薪：','popup-chores':'🧹 雜事：','popup-alone':'👤 獨立當班：',
-    'popup-mod':'若需修改，請','popup-mod-link':'聯絡管理員',
-    'popup-reports':'筆回報','popup-avg':'平均',
-    'popup-nav-of':'/',
-    'rt1':'⚡ 超雷','rt2':'偏雷','rt3':'普通','rt4':'不錯','rt5':'🏊 超推',
-    'welcome':'👋 歡迎，','ac-searching':'🔍 搜尋中...','ac-notfound':'找不到符合地點，可嘗試簡化關鍵字，或點下方「地圖選點」',
-    'hint-ok':'✅ 已選取場館位置，確認無誤後繼續填寫',
-    'hint-warn':'⚠️ 你已回報過此場館，每個場館只能回報一次，若需修改請聯絡管理員',
-    'hint-locating':'🔍 正在取得座標...','hint-map-ok':'✅ 已標記地圖位置',
-    'toast-submitted':'✅ 回報已送出，待管理員審核後顯示於地圖！',
-    'toast-contact':'✅ 已送出，管理員會盡快處理！',
-    'toast-logout':'已登出','toast-map':'請點選地圖上的場館位置',
-    'err-venue':'請先選擇場館','err-pay':'請選擇給薪模式','err-salary':'請填寫薪資水準',
-    'err-chores':'請選擇雜事負擔情形','err-alone':'請選擇是否獨立當班','err-rating':'請選擇整體評分',
-    'err-contact-reason':'請選擇聯絡原因','err-contact-msg':'請填寫說明內容',
-    'report-by':'回報者：',
-    'privacy':'隱私權政策','contact-admin':'聯絡管理員',
-  },
-  en:{
-    'logo-text':'LIFEGUARD RADAR',
-    'stat-label':'Reports',
-    'logout':'Sign Out',
-    'legend-title':'Rating',
-    'r1':'1 Terrible','r2':'2 Poor','r3':'3 OK','r4':'4 Good','r5':'5 Great',
-    'user-label-pre':'Sign in to Report','user-label-post':'Submit Report',
-    'login-title':'Sign in to Submit',
-    'login-desc':'Sign in to submit a report.<br>One report per venue per account.<br>Contact admin to make changes.',
-    'google-login':'Sign in with Google',
-    'report-title':'Venue Work Report',
-    'venue-label':'Venue Name or Address',
-    'venue-placeholder':'Search venue, e.g. Nangang Sports Center',
-    'map-pick-hint':'Can\'t find venue? Pick location on map →',
-    'map-pick-btn':'Open map picker',
-    'pay-label':'Pay Type',
-    'pay-hourly':'Hourly','pay-monthly':'Monthly Salary',
-    'salary-label':'Pay Rate',
-    'salary-placeholder':'e.g. NT$190/hr or NT$36,000/month',
-    'chores-label':'Extra Duties Required?',
-    'chore-none':'None','chore-clean':'Clean facility','chore-toilet':'Clean restrooms',
-    'chore-pump':'Pump room operation','chore-drug':'Chemical dosing','chore-counter':'Reception duties',
-    'chores-other-placeholder':'Other duties (optional)',
-    'alone-label':'Regularly work alone?',
-    'alone-yes':'Yes, often solo with full risk','alone-no':'No, staffing meets regulations',
-    'rating-label':'Overall Rating',
-    'rating-bad':'⚡ Terrible','rating-good':'🏊 Great','rating-mid':'OK',
-    'comment-label':'Comments or Recommendations',
-    'comment-placeholder':'Share your experience to help others!',
-    'anon-label':'Submit anonymously (hide your name)',
-    'submit-btn':'Review & Submit',
-    'confirm-title':'Confirm Submission?',
-    'confirm-pay':'Pay Type','confirm-salary':'Pay Rate',
-    'confirm-chores':'Extra Duties','confirm-alone':'Solo Shifts',
-    'confirm-notice':'⚠️ One report per venue per account<br>Contact admin to modify after submission<br>Reports require admin approval before appearing on map',
-    'btn-back':'← Go Back','btn-go':'Confirm Submit',
-    'contact-title':'Contact Admin',
-    'contact-reason-label':'Reason',
-    'contact-r1':'Modify report content','contact-r2':'Delete my report',
-    'contact-r3':'Incorrect information','contact-r4':'Other',
-    'contact-msg-label':'Details',
-    'contact-msg-placeholder':'Describe your issue or request...',
-    'contact-submit':'Send',
-    'map-pick-bar':'📍 Click on the map to select venue location',
-    'map-pick-cancel':'Cancel',
-    'popup-pay':'💰 Pay:','popup-chores':'🧹 Duties:','popup-alone':'👤 Solo shifts:',
-    'popup-mod':'To modify,','popup-mod-link':'contact admin',
-    'popup-reports':'reports','popup-avg':'avg',
-    'popup-nav-of':'/',
-    'rt1':'⚡ Terrible','rt2':'Poor','rt3':'OK','rt4':'Good','rt5':'🏊 Great',
-    'welcome':'👋 Welcome, ','ac-searching':'🔍 Searching...','ac-notfound':'No results found. Try different keywords or use map picker.',
-    'hint-ok':'✅ Venue selected. Continue filling the form.',
-    'hint-warn':'⚠️ You\'ve already reported this venue. Contact admin to modify.',
-    'hint-locating':'🔍 Getting coordinates...','hint-map-ok':'✅ Location marked on map',
-    'toast-submitted':'✅ Report submitted! Pending admin approval.',
-    'toast-contact':'✅ Message sent! Admin will respond soon.',
-    'toast-logout':'Signed out','toast-map':'Click on the map to select venue location',
-    'err-venue':'Please select a venue','err-pay':'Please select pay type','err-salary':'Please enter pay rate',
-    'err-chores':'Please select extra duties','err-alone':'Please select solo shift status','err-rating':'Please select a rating',
-    'err-contact-reason':'Please select a reason','err-contact-msg':'Please enter details',
-    'report-by':'Reporter: ',
-    'privacy':'Privacy Policy','contact-admin':'Contact Admin',
-  }
-};
-
-function t(key){ return DICT[lang][key] || DICT['zh'][key] || key; }
-
-function setLang(l){
-  lang = l;
-  localStorage.setItem('lang', l);
-  document.documentElement.setAttribute('lang', l==='zh'?'zh-TW':'en');
-  document.title = l==='zh' ? '救生員避雷地圖 | LIFEGUARD RADAR' : 'LIFEGUARD RADAR | 救生員避雷地圖';
-  ['zh','en'].forEach(x=>document.getElementById('btn-'+x).classList.toggle('active',x===l));
-  applyI18n();
-}
-
-function applyI18n(){
-  // data-i18n elements
-  document.querySelectorAll('[data-i18n]').forEach(el=>{
-    const k=el.getAttribute('data-i18n');
-    if(DICT[lang][k]) el.innerHTML=DICT[lang][k];
-  });
-  // dynamic elements
-  const ul=document.getElementById('user-label');
-  if(ul) ul.textContent = user ? t('user-label-post') : t('user-label-pre');
-  // 更新 attribution 連結文字
-  const ap=document.getElementById('attr-privacy');
-  const ac=document.getElementById('attr-contact');
-  if(ap) ap.textContent=t('privacy');
-  if(ac) ac.textContent=t('contact-admin');
-  const vi=document.getElementById('v-input');
-  if(vi) vi.placeholder=t('venue-placeholder');
-  const fs=document.getElementById('f-salary');
-  if(fs) fs.placeholder=t('salary-placeholder');
-  const fc=document.getElementById('f-comment');
-  if(fc) fc.placeholder=t('comment-placeholder');
-  const co=document.getElementById('f-chores-other');
-  if(co) co.placeholder=t('chores-other-placeholder');
-  const cm=document.getElementById('contact-msg');
-  if(cm) cm.placeholder=t('contact-msg-placeholder');
-  const vs=document.getElementById('venue-search');
-  if(vs) vs.placeholder=lang==='en'?'Search venues…':'搜尋場館…';
-  // 若有 popup 開著，重新渲染以更新語言
-  if(popOpenPid && markers.has(popOpenPid)){
-    const mk=markers.get(popOpenPid);
-    mk.setPopupContent(popHTML(popOpenPid, popIdx));
-  }
-}
-
-const T = {
-  get 1(){ return t('rt1'); }, get 2(){ return t('rt2'); },
-  get 3(){ return t('rt3'); }, get 4(){ return t('rt4'); }, get 5(){ return t('rt5'); }
-};
+const T = {1:'⚡ 超雷',2:'偏雷',3:'普通',4:'不錯',5:'🏊 超推'};
 
 /* ══ STATE ══ */
 let theme='light', tile=null, user=null;
@@ -625,51 +368,6 @@ let acTimer=null, acResults=[];
 const venues  = new Map(); // placeId → {name,address,lat,lon,reports[]}
 const markers = new Map(); // placeId → L.Marker
 let popIdx=0;
-let popSortMode='new';
-let popOpenPid=null; // 追蹤目前開著的 popup
-
-function timeAgo(dateStr){
-  if(!dateStr) return '';
-  const d = new Date(dateStr);
-  if(isNaN(d)) return dateStr;
-  const diff = Date.now() - d.getTime();
-  const mins  = Math.floor(diff/60000);
-  const hours = Math.floor(diff/3600000);
-  const days  = Math.floor(diff/86400000);
-  if(lang==='en'){
-    if(mins  < 1)   return 'just now';
-    if(mins  < 60)  return `${mins}m ago`;
-    if(hours < 24)  return `${hours}h ago`;
-    if(days  < 7)   return `${days}d ago`;
-    return d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
-  } else {
-    if(mins  < 1)   return '剛剛';
-    if(mins  < 60)  return `${mins} 分鐘前`;
-    if(hours < 24)  return `${hours} 小時前`;
-    if(days  < 7)   return `${days} 天前`;
-    return d.toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric'});
-  }
-}
-
-const SORT_MODES = ['new','old','high','low'];
-const SORT_LABELS = {
-  zh: { new:'由新到舊', old:'由舊到新', high:'評分高到低', low:'評分低到高' },
-  en: { new:'Newest first', old:'Oldest first', high:'Highest rated', low:'Lowest rated' },
-};
-
-function sortedReports(reps){
-  return [...reps].sort((a,b)=>{
-    if(popSortMode==='new'){
-      return new Date(b.created_at||0) - new Date(a.created_at||0);
-    } else if(popSortMode==='old'){
-      return new Date(a.created_at||0) - new Date(b.created_at||0);
-    } else if(popSortMode==='high'){
-      return b.rating - a.rating;
-    } else {
-      return a.rating - b.rating;
-    }
-  });
-}
 
 /* ══ MAP ══ */
 const TILES = {
@@ -685,13 +383,6 @@ function applyTile(dark){
     attribution:'© <a href="https://www.openstreetmap.org/copyright">OSM</a> © <a href="https://carto.com/">CARTO</a>',
     subdomains:'abcd',maxZoom:19
   }).addTo(map);
-  // 重新補上自訂連結
-  setTimeout(()=>{
-    const attr=document.querySelector('.leaflet-control-attribution');
-    if(attr && !document.getElementById('attr-privacy')){
-      attr.innerHTML += ` | <a href="/privacy" target="_blank" id="attr-privacy">${t('privacy')}</a> | <a onclick="openContact(null,null)" style="cursor:pointer;" id="attr-contact">${t('contact-admin')}</a>`;
-    }
-  }, 100);
 }
 
 function setTheme(t){
@@ -704,7 +395,7 @@ function setTheme(t){
 
 /* ══ ICON ══ */
 function avg(reps){ return reps.reduce((a,r)=>a+r.rating,0)/reps.length; }
-function avgClr(reps){ const a=Math.floor(avg(reps)); return C[Math.max(1,Math.min(5,a))]; }
+function avgClr(reps){ const a=avg(reps); return a<1.5?C[1]:a<2.5?C[2]:a<3.5?C[3]:a<4.5?C[4]:C[5]; }
 function mkIcon(reps){
   const col=avgClr(reps);
   const lbl=reps.length===1?String(reps[0].rating):avg(reps).toFixed(1);
@@ -725,29 +416,16 @@ function mkIcon(reps){
 
 /* ══ POPUP ══ */
 function popHTML(pid, idx){
-  const v=venues.get(pid);
-  const sorted=sortedReports(v.reports);
-  const r=sorted[idx], tot=sorted.length;
+  const v=venues.get(pid), r=v.reports[idx], tot=v.reports.length;
   const col=C[r.rating];
   const chores=r.chores&&r.chores.length?r.chores.join('、'):'無';
-  const avgStr=tot>1?`<div class="popup-avg">共 ${tot} ${t('popup-reports')} · ${t('popup-avg')} <b>${avg(v.reports).toFixed(1)}</b> 分</div>`:'';
-  const timeStr=timeAgo(r.created_at);
-  const sortOpts = Object.entries(SORT_LABELS[lang]).map(([val,lbl])=>
-    `<option value="${val}" ${val===popSortMode?'selected':''}>${lbl}</option>`
-  ).join('');
+  const avgStr=tot>1?`<div class="popup-avg">共 ${tot} 筆 · 平均 <b>${avg(v.reports).toFixed(1)}</b> 分</div>`:'';
   const navBar=`<div class="popup-nav">
-    <button class="nav-arr" ${idx===0?'disabled':''} onclick="event.stopPropagation();popNav('${pid}',-1)">‹</button>
+    <button class="nav-arr" ${idx===0?'disabled':''} onclick="popNav('${pid}',-1)">‹</button>
     <div class="nav-mid">第&nbsp;<input class="nav-in" type="number" min="1" max="${tot}" value="${idx+1}"
-      onchange="event.stopPropagation();popJump('${pid}',this.value)">&nbsp;筆
+      onchange="popJump('${pid}',this.value)">&nbsp;筆
       <span style="color:var(--text-muted)">/ ${tot}</span></div>
-    <button class="nav-arr" ${idx===tot-1?'disabled':''} onclick="event.stopPropagation();popNav('${pid}',1)">›</button>
-  </div>
-  <div style="padding:4px 12px 6px;display:flex;justify-content:flex-end;">
-    <select onchange="event.stopPropagation();changeSort('${pid}',this.value)"
-      style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;
-        color:var(--text-muted);font-size:10px;padding:2px 6px;font-family:inherit;cursor:pointer;outline:none;">
-      ${sortOpts}
-    </select>
+    <button class="nav-arr" ${idx===tot-1?'disabled':''} onclick="popNav('${pid}',1)">›</button>
   </div>`;
   return `<div class="popup-head">
     <div class="popup-name">${v.name}</div>
@@ -756,25 +434,15 @@ function popHTML(pid, idx){
     ${avgStr}</div>
   ${tot>1?navBar:''}
   <div class="popup-body">
-    <div class="popup-row">${t('popup-pay')}<span>${r.pay_type}、${r.salary}</span></div>
-    <div class="popup-row">${t('popup-chores')}<span>${chores}</span></div>
-    <div class="popup-row">${t('popup-alone')}<span>${r.alone}</span></div>
+    <div class="popup-row">💰 給薪：<span>${r.pay_type}　${r.salary}</span></div>
+    <div class="popup-row">🧹 雜事：<span>${chores}</span></div>
+    <div class="popup-row">👤 獨立當班：<span>${r.alone}</span></div>
     ${r.comment?`<div class="popup-comment">💬 ${r.comment}</div>`:''}
-    <div class="popup-mod">${t('popup-mod')} <a onclick="openContact('${pid}',${idx})">${t('popup-mod-link')}</a></div>
-    ${timeStr?`<div style="text-align:right;font-size:10px;color:var(--text-muted);margin-top:6px;">${timeStr}</div>`:''}
+    <div class="popup-mod">若需修改，請 <a href="mailto:admin@example.com">聯絡管理員</a></div>
   </div>`;
 }
 
-function changeSort(pid, mode){
-  popSortMode = mode;
-  popIdx = 0;
-  const mk = markers.get(pid);
-  mk.setPopupContent(popHTML(pid, 0));
-  mk.openPopup();
-}
-
 function openPopup(pid,idx){
-  popOpenPid=pid;
   popIdx=idx;
   const mk=markers.get(pid);
   if(!mk) return;
@@ -783,20 +451,14 @@ function openPopup(pid,idx){
 }
 function popNav(pid,dir){
   const v=venues.get(pid);
-  const tot=sortedReports(v.reports).length;
-  popIdx=Math.max(0,Math.min(tot-1,popIdx+dir));
-  const mk=markers.get(pid);
-  mk.setPopupContent(popHTML(pid,popIdx));
-  mk.openPopup();
+  popIdx=Math.max(0,Math.min(v.reports.length-1,popIdx+dir));
+  markers.get(pid).setPopupContent(popHTML(pid,popIdx));
 }
 function popJump(pid,val){
   const n=parseInt(val)-1; if(isNaN(n)) return;
   const v=venues.get(pid);
-  const tot=sortedReports(v.reports).length;
-  popIdx=Math.max(0,Math.min(tot-1,n));
-  const mk=markers.get(pid);
-  mk.setPopupContent(popHTML(pid,popIdx));
-  mk.openPopup();
+  popIdx=Math.max(0,Math.min(v.reports.length-1,n));
+  markers.get(pid).setPopupContent(popHTML(pid,popIdx));
 }
 
 /* ══ ADD ROW TO MAP ══ */
@@ -815,7 +477,6 @@ function addRowToMap(row){
     const mk=L.marker([v.lat,v.lon],{icon:mkIcon(v.reports)}).addTo(map);
     mk.bindPopup('',{maxWidth:300});
     mk.on('click',()=>openPopup(pid,0));
-    mk.on('popupclose',()=>{ popOpenPid=null; });
     markers.set(pid,mk);
   }
   updateStats();
@@ -846,25 +507,14 @@ sb.auth.onAuthStateChange((event, session)=>{
   if(session?.user){
     const u=session.user;
     user = { id: u.id, name: u.user_metadata?.full_name || u.email };
-    document.getElementById('user-label').textContent=t('user-label-post');
-    document.getElementById('logout-btn').style.display='block';
+    document.getElementById('user-label').textContent='立即回報';
     closeOv('ov-login');
-    if(event==='SIGNED_IN' && !sessionStorage.getItem('welcomed')){
-      sessionStorage.setItem('welcomed','1');
-      showToast(t('welcome')+user.name+'！');
-    }
+    if(event==='SIGNED_IN') showToast('👋 歡迎，'+user.name+'！');
   } else {
     user=null;
-    sessionStorage.removeItem('welcomed');
-    document.getElementById('user-label').textContent=t('user-label-pre');
-    document.getElementById('logout-btn').style.display='none';
+    document.getElementById('user-label').textContent='登入後回報';
   }
 });
-
-async function logout(){
-  await sb.auth.signOut();
-  showToast(t('toast-logout'));
-}
 
 /* ══ VENUE AUTOCOMPLETE ══ */
 function onVI(){
@@ -872,7 +522,7 @@ function onVI(){
   const q=document.getElementById('v-input').value.trim();
   const drop=document.getElementById('ac-drop');
   if(q.length<2){ drop.classList.remove('open'); return; }
-  drop.innerHTML='<div class="ac-msg">'+t('ac-searching')+'</div>';
+  drop.innerHTML='<div class="ac-msg">🔍 搜尋中...</div>';
   drop.classList.add('open');
   acTimer=setTimeout(()=>fetchAC(q),500);
 }
@@ -882,118 +532,33 @@ function onVF(){
 }
 async function fetchAC(q){
   try{
-    // Google Places API (New) — Autocomplete，限制台灣地區
-    const res=await fetch('https://places.googleapis.com/v1/places:autocomplete',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','X-Goog-Api-Key':GOOGLE_KEY},
-      body:JSON.stringify({
-        input: q,
-        includedRegionCodes: ['tw'],
-        languageCode: 'zh-TW'
-      })
-    });
-    const data=await res.json();
-    acResults=data.suggestions||[];
-    renderAC();
+    const r=await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q+' 台灣')}&format=json&limit=6&addressdetails=1&namedetails=1`,
+      {headers:{'Accept-Language':'zh-TW'}}
+    );
+    acResults=await r.json(); renderAC();
   }catch{ document.getElementById('ac-drop').classList.remove('open'); }
 }
 function renderAC(){
   const drop=document.getElementById('ac-drop');
-  if(!acResults.length){
-    drop.innerHTML='<div class="ac-msg">'+t('ac-notfound')+'</div>'; return;
-  }
-  drop.innerHTML=acResults.map((s,i)=>{
-    const p=s.placePrediction;
-    const main=p.structuredFormat?.mainText?.text||p.text.text.split(',')[0];
-    const sub=p.structuredFormat?.secondaryText?.text||'';
+  if(!acResults.length){ drop.innerHTML='<div class="ac-msg">找不到符合地點，請嘗試其他關鍵字</div>'; return; }
+  drop.innerHTML=acResults.map((r,i)=>{
+    const name=r.namedetails?.name||r.display_name.split(',')[0];
     return `<div class="ac-item" onclick="pickVenue(${i})">
-      <div class="ac-name">${main}</div>
-      ${sub?`<div class="ac-addr">${sub}</div>`:''}
-    </div>`;
+      <div class="ac-name">${name}</div><div class="ac-addr">${r.display_name}</div></div>`;
   }).join('');
 }
-async function pickVenue(i){
-  const p=acResults[i].placePrediction;
-  const placeId=p.placeId;
-  const main=p.structuredFormat?.mainText?.text||p.text.text.split(',')[0];
-  const sub=p.structuredFormat?.secondaryText?.text||p.text.text;
-
-  // 先鎖定顯示，再非同步查座標
+function pickVenue(i){
+  const r=acResults[i];
+  const name=r.namedetails?.name||r.display_name.split(',')[0];
+  selVenue={placeId:String(r.place_id),name,address:r.display_name,lat:parseFloat(r.lat),lon:parseFloat(r.lon)};
   document.getElementById('v-input').style.display='none';
-  document.getElementById('v-locked-name').textContent=main;
-  document.getElementById('v-locked-addr').textContent=sub;
+  document.getElementById('v-locked-name').textContent=name;
+  document.getElementById('v-locked-addr').textContent=r.display_name;
   document.getElementById('v-locked').style.display='flex';
   document.getElementById('ac-drop').classList.remove('open');
-  document.getElementById('v-hint').textContent=t('hint-locating');
-  document.getElementById('v-hint').className='ac-hint';
-
-  try{
-    // 取得精確座標
-    const res=await fetch(
-      `https://places.googleapis.com/v1/places/${placeId}?fields=location,displayName,formattedAddress`,
-      {headers:{'X-Goog-Api-Key':GOOGLE_KEY,'X-Goog-FieldMask':'location,displayName,formattedAddress'}}
-    );
-    const d=await res.json();
-    selVenue={
-      placeId,
-      name:     d.displayName?.text||main,
-      address:  d.formattedAddress||sub,
-      lat:      d.location.latitude,
-      lon:      d.location.longitude
-    };
-    document.getElementById('v-locked-name').textContent=selVenue.name;
-    document.getElementById('v-locked-addr').textContent=selVenue.address;
-    checkDup();
-  }catch{
-    showToast('取得座標失敗，請重試','err');
-    clearVenue();
-  }
+  checkDup();
 }
-
-/* ══ MAP PICK MODE ══ */
-let mapPickMode=false;
-function startMapPick(){
-  closeOv('ov-report');
-  mapPickMode=true;
-  showToast(t('toast-map'));
-  map.getContainer().style.cursor='crosshair';
-  // 提示覆蓋層
-  document.getElementById('map-pick-hint').style.display='flex';
-}
-function cancelMapPick(){
-  mapPickMode=false;
-  map.getContainer().style.cursor='';
-  document.getElementById('map-pick-hint').style.display='none';
-  openOv('ov-report');
-}
-map.on('click',async function(e){
-  document.getElementById('ac-drop').classList.remove('open');
-  if(!mapPickMode) return;
-  mapPickMode=false;
-  map.getContainer().style.cursor='';
-  document.getElementById('map-pick-hint').style.display='none';
-
-  const {lat,lng}=e.latlng;
-  // 反查地址（reverse geocoding）
-  showToast('正在查詢位置資訊...');
-  try{
-    const r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&namedetails=1&accept-language=zh-TW`);
-    const d=await r.json();
-    const name=d.namedetails?.name||d.display_name.split(',')[0];
-    const parts=d.display_name.split(',').map(s=>s.trim()).filter(s=>s&&s!=='台灣'&&s!=='Taiwan');
-    const shortAddr=parts.slice(0,3).join('、');
-    selVenue={placeId:'custom_'+lat.toFixed(5)+'_'+lng.toFixed(5),name,address:shortAddr,lat,lon:lng};
-    document.getElementById('v-input').style.display='none';
-    document.getElementById('v-locked-name').textContent=name;
-    document.getElementById('v-locked-addr').textContent=shortAddr;
-    document.getElementById('v-locked').style.display='flex';
-    document.getElementById('v-hint').textContent=t('hint-map-ok');
-    document.getElementById('v-hint').className='ac-hint ok';
-  }catch{
-    showToast('查詢位置失敗，請重試','err');
-  }
-  openOv('ov-report');
-});
 function clearVenue(){
   selVenue=null;
   document.getElementById('v-input').style.display='';
@@ -1011,11 +576,11 @@ async function checkDup(){
   const {data}=await sb.from('reports')
     .select('id').eq('user_id',user.id).eq('place_id',selVenue.placeId).limit(1);
   if(data&&data.length>0){
-    hint.textContent=t('hint-warn');
+    hint.textContent='⚠️ 你已回報過此場館，每個場館只能回報一次，若需修改請聯絡管理員';
     hint.className='ac-hint warn';
     document.getElementById('submit-btn').disabled=true;
   } else {
-    hint.textContent=t('hint-ok');
+    hint.textContent='✅ 已選取場館位置，確認無誤後繼續填寫';
     hint.className='ac-hint ok';
     document.getElementById('submit-btn').disabled=false;
   }
@@ -1024,7 +589,7 @@ async function checkDup(){
 /* ══ REPORT FLOW ══ */
 function tryReport(){
   if(!user){ openOv('ov-login'); return; }
-  document.getElementById('report-sub').textContent=t('report-by')+user.name;
+  document.getElementById('report-sub').textContent='回報者：'+user.name;
   openOv('ov-report');
 }
 function setRating(v){
@@ -1032,7 +597,7 @@ function setRating(v){
   document.querySelectorAll('.rbtn').forEach(b=>b.classList.toggle('active',+b.dataset.v===v));
 }
 function openConfirm(){
-  if(!selVenue) return toast(t('err-venue'),'err');
+  if(!selVenue) return toast('請先選擇場館','err');
   const pay=document.querySelector('input[name="pay"]:checked')?.value;
   const salary=document.getElementById('f-salary').value.trim();
   const alone=document.querySelector('input[name="alone"]:checked')?.value;
@@ -1041,11 +606,11 @@ function openConfirm(){
   if(co) chores.push(co);
   const comment=document.getElementById('f-comment').value.trim();
 
-  if(!pay)          return toast(t('err-pay'),'err');
-  if(!salary)       return toast(t('err-salary'),'err');
-  if(!chores.length)return toast(t('err-chores'),'err');
-  if(!alone)        return toast(t('err-alone'),'err');
-  if(!selRating)    return toast(t('err-rating'),'err');
+  if(!pay)          return toast('請選擇給薪模式','err');
+  if(!salary)       return toast('請填寫薪資水準','err');
+  if(!chores.length)return toast('請選擇雜事負擔情形','err');
+  if(!alone)        return toast('請選擇是否獨立當班','err');
+  if(!selRating)    return toast('請選擇整體評分','err');
 
   const col=C[selRating];
   document.getElementById('c-name').textContent=selVenue.name;
@@ -1060,7 +625,7 @@ function openConfirm(){
   const cc=document.getElementById('c-comment');
   if(comment){cc.textContent='💬 '+comment;cc.style.display='';}else{cc.style.display='none';}
 
-  window._p={pay,salary,chores,alone,comment,anon:document.getElementById('f-anon').checked};
+  window._p={pay,salary,chores,alone,comment};
   openOv('ov-confirm');
 }
 
@@ -1073,7 +638,7 @@ async function submitReport(){
 
   const {error}=await sb.from('reports').insert({
     user_id:    user.id,
-    user_name:  p.anon ? '匿名' : user.name,
+    user_name:  user.name,
     place_id:   selVenue.placeId,
     place_name: selVenue.name,
     address:    selVenue.address,
@@ -1095,7 +660,7 @@ async function submitReport(){
   }
 
   closeOv('ov-confirm'); closeOv('ov-report');
-  showToast(t('toast-submitted'));
+  showToast('✅ 回報已送出，待管理員審核後顯示於地圖！');
   resetForm();
 }
 
@@ -1103,7 +668,6 @@ function resetForm(){
   selRating=0; selVenue=null; window._p=null;
   clearVenue();
   ['f-salary','f-comment','f-chores-other'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('f-anon').checked=false;
   document.querySelectorAll('input[name="pay"],input[name="alone"],input[name="chores"]')
     .forEach(el=>el.checked=false);
   document.querySelectorAll('.rbtn').forEach(b=>b.classList.remove('active'));
@@ -1113,43 +677,6 @@ function resetForm(){
 function updateStats(){
   let t=0; venues.forEach(v=>t+=v.reports.length);
   document.getElementById('stat-total').textContent=t;
-}
-
-/* ══ CONTACT ══ */
-let contactPid=null, contactReportId=null;
-function openContact(pid, idx){
-  if(!user){ openOv('ov-login'); return; }
-  const v=pid?venues.get(pid):null;
-  const r=v?.reports[idx];
-  contactPid=pid;
-  contactReportId=r?.id||null;
-  document.getElementById('contact-msg').value='';
-  document.querySelectorAll('input[name="contact-type"]').forEach(el=>el.checked=false);
-  openOv('ov-contact');
-}
-async function submitContact(){
-  const type=document.querySelector('input[name="contact-type"]:checked')?.value;
-  const msg=document.getElementById('contact-msg').value.trim();
-  if(!type) return toast(t('err-contact-reason'),'err');
-  if(!msg)  return toast(t('err-contact-msg'),'err');
-
-  const btn=document.getElementById('contact-submit');
-  btn.disabled=true; btn.textContent='送出中...';
-
-  const v=venues.get(contactPid);
-  const {error}=await sb.from('contacts').insert({
-    user_id:    user.id,
-    user_name:  user.name,
-    place_name: v?.name||'',
-    report_id:  contactReportId,
-    message:    `【${type}】${msg}`,
-    status:     'unread'
-  });
-
-  btn.disabled=false; btn.textContent='送出';
-  if(error){ toast('送出失敗：'+error.message,'err'); return; }
-  closeOv('ov-contact');
-  showToast(t('toast-contact'));
 }
 
 /* ══ OVERLAY ══ */
@@ -1167,75 +694,8 @@ function showToast(msg,type=''){
 function toast(msg,type){ showToast(msg,type); }
 
 /* ══ INIT ══ */
-// Console 彩蛋
-console.log('%c그대로 멈춰 거기 Stop', 'font-size:18px;font-weight:bold;color:#06b6d4;');
-console.log('%cBuilt by 中和雞鴨扣σ`∀´)σ', 'color:#888;font-size:12px;');
-console.log('%c그대로 멈춰 거기 Stop', 'font-size:18px;font-weight:bold;color:#06b6d4;');
-console.log('%cBlock B (블락비) · 2011 · Built with ❤️ by a ZICO fan', 'color:#888;font-size:12px;');
-// 語言：優先用 localStorage，其次偵測系統語言
-const savedLang = localStorage.getItem('lang');
-const sysLang = navigator.language || navigator.userLanguage || 'zh';
-const initLang = savedLang || (sysLang.startsWith('en') ? 'en' : 'zh');
-setLang(initLang);
-
 setTheme('light');
-
-// OAuth redirect 回來時，網址 hash 裡有 token，讓 Supabase 處理後清掉
-if (window.location.hash && window.location.hash.includes('access_token')) {
-  sb.auth.getSession().then(() => {
-    // 清掉網址 hash，避免 token 外露
-    history.replaceState(null, '', window.location.pathname);
-  });
-}
-map.on('click',()=>{
-  document.getElementById('ac-drop').classList.remove('open');
-  document.getElementById('venue-search-drop').style.display='none';
-});
-
-/* ══ VENUE SEARCH ══ */
-function onVenueSearch(){
-  const q = document.getElementById('venue-search').value.trim().toLowerCase();
-  const drop = document.getElementById('venue-search-drop');
-  if(!q || venues.size===0){ drop.style.display='none'; return; }
-
-  const matches = [...venues.entries()].filter(([,v])=>
-    v.name.toLowerCase().includes(q) || v.address.toLowerCase().includes(q)
-  );
-
-  if(!matches.length){
-    drop.innerHTML=`<div style="padding:10px 13px;font-size:13px;color:var(--text-muted);">${lang==='en'?'No venues found':'找不到符合場館'}</div>`;
-    drop.style.display='block'; return;
-  }
-
-  drop.innerHTML = matches.map(([pid,v])=>{
-    const a = avg(v.reports);
-    const col = avgClr(v.reports);
-    return `<div onclick="goToVenue('${pid}')"
-      style="padding:10px 13px;cursor:pointer;border-bottom:1px solid var(--border);
-        display:flex;align-items:center;gap:10px;transition:background .12s;"
-      onmouseover="this.style.background='var(--surface2)'"
-      onmouseout="this.style.background=''">
-      <div style="width:28px;height:28px;border-radius:50%;background:${col};flex-shrink:0;
-        display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:900;">
-        ${v.reports.length===1?v.reports[0].rating:a.toFixed(1)}
-      </div>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:var(--text);">${v.name}</div>
-        <div style="font-size:11px;color:var(--text-muted);">${v.reports.length} ${lang==='en'?'report(s)':'筆回報'}</div>
-      </div>
-    </div>`;
-  }).join('');
-  drop.style.display='block';
-}
-
-function goToVenue(pid){
-  const v = venues.get(pid);
-  if(!v) return;
-  document.getElementById('venue-search').value='';
-  document.getElementById('venue-search-drop').style.display='none';
-  map.setView([v.lat, v.lon], 16, {animate:true, duration:.8});
-  setTimeout(()=>openPopup(pid,0), 700);
-}
+map.on('click',()=>document.getElementById('ac-drop').classList.remove('open'));
 
 function alignActionBtn(){
   const zoom=document.querySelector('.leaflet-control-zoom');
@@ -1251,106 +711,5 @@ window.addEventListener('resize',alignActionBtn);
 // 載入已審核回報 + 等地圖 ready
 loadReports();
 </script>
-<!-- 隱私權政策靜態連結（供 Google 爬蟲索引） -->
-<a href="/privacy" style="display:none;" aria-hidden="true">隱私權政策 Privacy Policy</a>
-<!-- 🎤 Easter Egg -->
-<div id="easter-egg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);
-  z-index:9999;align-items:center;justify-content:center;flex-direction:column;
-  font-family:'Noto Sans TC',sans-serif;color:#fff;text-align:center;cursor:pointer;"
-  onclick="document.getElementById('easter-egg').style.display='none'">
-  <div style="font-size:13px;letter-spacing:.2em;color:#aaa;margin-bottom:24px;text-transform:uppercase;">Block B · 2011</div>
-  <div style="font-size:clamp(28px,6vw,56px);font-weight:900;letter-spacing:.05em;line-height:1.3;
-    background:linear-gradient(135deg,#06b6d4,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
-    그대로 멈춰<br>거기 stop
-  </div>
-  <div style="font-size:14px;color:#888;margin-top:28px;max-width:320px;line-height:1.8;">
-    그냥 거기 멈춰줘<br>
-    <span style="font-size:12px;color:#555;">Just stop right there</span>
-  </div>
-  <div style="font-size:11px;color:#444;margin-top:48px;">Built with ❤️ by a ZICO & Block B fan<br>— 停止救生員產業的低劣就業環境 —</div>
-  <div style="font-size:11px;color:#333;margin-top:16px;">點擊任意處關閉</div>
-</div>
-
-<script>
-// Konami Code: ↑↑↓↓←→←→BA
-(function(){
-  const code = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
-  let idx = 0;
-  document.addEventListener('keydown', e => {
-    if(e.key === code[idx]) {
-      idx++;
-      if(idx === code.length){
-        document.getElementById('easter-egg').style.display='flex';
-        idx = 0;
-      }
-    } else {
-      idx = e.key === code[0] ? 1 : 0;
-    }
-  });
-})();
-</script>
-
-<!-- ── 彩蛋 ── -->
-<div onclick="openOv('ov-egg')"
-  style="position:fixed;bottom:4px;left:50%;transform:translateX(-50%);z-index:999;
-    font-size:10px;color:var(--text-muted);opacity:0.5;cursor:pointer;white-space:nowrap;
-    transition:opacity .2s;letter-spacing:.04em;"
-  onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='.5'">
-  그대로 멈춰 거기 Stop!
-</div>
-
-<div class="overlay" id="ov-egg" onclick="if(event.target.id==='ov-egg')closeOv('ov-egg')">
-  <div style="
-    position:relative;max-width:440px;width:100%;
-    background:#0a0a0a;border-radius:4px;overflow:hidden;
-    box-shadow:0 30px 80px rgba(0,0,0,.9);
-    animation:slideUp .22s ease;
-  ">
-    <!-- 點狀背景 -->
-    <div style="
-      position:absolute;inset:0;
-      background-image:radial-gradient(circle, #2a2a2a 1px, transparent 1px);
-      background-size:10px 10px;
-      opacity:0.9;
-    "></div>
-    <!-- 漸層覆蓋 -->
-    <div style="
-      position:absolute;inset:0;
-      background:radial-gradient(ellipse at center, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.85) 100%);
-    "></div>
-
-    <!-- 內容 -->
-    <div style="position:relative;z-index:1;padding:56px 44px 52px;text-align:center;">
-      <button onclick="closeOv('ov-egg')"
-        style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,.08);
-          border:1px solid rgba(255,255,255,.15);border-radius:6px;color:#aaa;
-          cursor:pointer;width:28px;height:28px;font-size:14px;display:flex;
-          align-items:center;justify-content:center;">✕</button>
-
-      <!-- 主歌詞 -->
-      <div style="
-        font-size:40px;font-weight:900;letter-spacing:-.01em;line-height:1.25;
-        color:#c8c8c8;
-        text-shadow:0 0 40px rgba(200,200,200,.15);
-        margin-bottom:32px;
-        font-family:'Noto Sans TC','PingFang TC',sans-serif;
-      ">그대로 멈춰 거기 Stop!</div>
-
-      <!-- 分隔 -->
-      <div style="width:36px;height:1px;background:rgba(200,200,200,.3);margin:0 auto 28px;"></div>
-
-      <!-- 口號 -->
-      <div style="
-        font-size:13px;letter-spacing:.12em;color:#888;
-        font-family:'Noto Sans TC','PingFang TC',sans-serif;
-        line-height:1.8;
-      ">
-        停止忍受救生員的低劣就業環境！<br>
-        <span style="font-size:11px;opacity:.6;letter-spacing:.06em;">Built by 中和雞鴨扣σ`∀´)σ</span>
-      </div>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
