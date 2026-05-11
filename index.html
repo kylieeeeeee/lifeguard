@@ -235,7 +235,7 @@ textarea.finput{resize:vertical;min-height:75px;}
     <div class="topbar-tools">
       <div style="position:relative;" id="venue-search-wrap">
         <input id="venue-search" type="text" autocomplete="off"
-          placeholder="搜尋場館…"
+          placeholder="搜尋…"
           oninput="onVenueSearch()" onfocus="onVenueSearch()"
           style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;
             height:32px;padding:0 10px;font-family:inherit;font-size:13px;color:var(--text);
@@ -632,7 +632,7 @@ function applyI18n(){
   const cm=document.getElementById('contact-msg');
   if(cm) cm.placeholder=t('contact-msg-placeholder');
   const vs=document.getElementById('venue-search');
-  if(vs) vs.placeholder=lang==='en'?'Search venues…':'搜尋場館…';
+  if(vs) vs.placeholder=lang==='en'?'Search…':'搜尋…';
   // 若有 popup 開著，重新渲染以更新語言
   if(popOpenPid && markers.has(popOpenPid)){
     const mk=markers.get(popOpenPid);
