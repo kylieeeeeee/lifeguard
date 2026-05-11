@@ -805,11 +805,12 @@ function changeSort(pid, mode){
 function openPopup(pid,idx){
   popOpenPid=pid;
   popIdx=idx;
-  // 只在手機上隱藏遮擋元素
+  // 電腦手機都隱藏漸層
+  document.querySelector('.topbar').style.background='transparent';
+  // 只在手機上隱藏其他遮擋元素
   if(window.innerWidth <= 640){
     document.querySelector('.legend').style.visibility='hidden';
     document.getElementById('action-btn').style.visibility='hidden';
-    document.querySelector('.topbar').style.background='transparent';
     document.getElementById('venue-search-wrap').style.visibility='hidden';
     document.querySelector('.stat-card').style.visibility='hidden';
     const logout=document.getElementById('logout-btn');
