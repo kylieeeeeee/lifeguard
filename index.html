@@ -985,9 +985,9 @@ async function pickVenue(i){
   document.getElementById('v-hint').className='ac-hint';
 
   try{
-    // 取得精確座標
+    // 取得精確座標，強制中文地址
     const res=await fetch(
-      `https://places.googleapis.com/v1/places/${placeId}?fields=location,displayName,formattedAddress`,
+      `https://places.googleapis.com/v1/places/${placeId}?fields=location,displayName,formattedAddress&languageCode=zh-TW`,
       {headers:{'X-Goog-Api-Key':GOOGLE_KEY,'X-Goog-FieldMask':'location,displayName,formattedAddress'}}
     );
     const d=await res.json();
