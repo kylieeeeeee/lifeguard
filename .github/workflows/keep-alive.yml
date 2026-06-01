@@ -1,4 +1,5 @@
 name: Supabase Keep Alive
+
 on:
   schedule:
     - cron: '0 0 */5 * *'  # 每 5 天執行一次
@@ -8,9 +9,16 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase
+      - name: Ping Supabase Database
         run: |
-          curl -s "https://euinsntybozxjhsddeqm.supabase.co/rest/v1/reports?select=id&limit=1" \
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://euinsntybozxjhsddeqm.supabase.co/rest/v1/reports?select=id&limit=1" \
             -H "apikey: sb_publishable_AbidJYNYkRcpXqj49kscCQ_VMWZlx2L" \
-            -H "Authorization: Bearer sb_publishable_AbidJYNYkRcpXqj49kscCQ_VMWZlx2L"
-          echo "Ping sent at $(date)"
+            -H "Authorization: Bearer sb_publishable_AbidJYNYkRcpXqj49kscCQ_VMWZlx2L")
+          echo "HTTP Status: $STATUS"
+          if [ "$STATUS" = "200" ]; then
+            echo "✅ Supabase is alive"
+          else
+            echo "❌ Unexpected status: $STATUS"
+            exit 1
+          fi
