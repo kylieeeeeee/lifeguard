@@ -216,7 +216,6 @@ textarea.finput{resize:vertical;min-height:75px;}
 </style>
 </head>
 <body>
-<div id="map"></div>
 
 <div class="topbar">
   <div class="logo">
@@ -1371,53 +1370,91 @@ loadReports();
 
 <div class="overlay" id="ov-egg" onclick="if(event.target.id==='ov-egg')closeOv('ov-egg')">
   <div style="
-    position:relative;max-width:440px;width:100%;
+    position:relative;max-width:660px;width:100%;max-height:88vh;
     background:#0a0a0a;border-radius:4px;overflow:hidden;
     box-shadow:0 30px 80px rgba(0,0,0,.9);
-    animation:slideUp .22s ease;
+    animation:slideUp .22s ease;display:flex;flex-direction:column;
   ">
     <!-- 點狀背景 -->
-    <div style="
-      position:absolute;inset:0;
-      background-image:radial-gradient(circle, #2a2a2a 1px, transparent 1px);
-      background-size:10px 10px;
-      opacity:0.9;
-    "></div>
+    <div style="position:absolute;inset:0;background-image:radial-gradient(circle, #2a2a2a 1px, transparent 1px);background-size:10px 10px;opacity:0.9;pointer-events:none;"></div>
     <!-- 漸層覆蓋 -->
-    <div style="
-      position:absolute;inset:0;
-      background:radial-gradient(ellipse at center, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.85) 100%);
-    "></div>
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.85) 100%);pointer-events:none;"></div>
 
-    <!-- 內容 -->
-    <div style="position:relative;z-index:1;padding:56px 44px 52px;text-align:center;">
+    <!-- 固定標題區 -->
+    <div style="position:relative;z-index:1;padding:40px 44px 0;flex-shrink:0;">
       <button onclick="closeOv('ov-egg')"
         style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,.08);
           border:1px solid rgba(255,255,255,.15);border-radius:6px;color:#aaa;
           cursor:pointer;width:28px;height:28px;font-size:14px;display:flex;
           align-items:center;justify-content:center;">✕</button>
+      <div style="font-size:32px;font-weight:900;color:#c8c8c8;line-height:1.2;
+        font-family:'Noto Sans TC','PingFang TC',sans-serif;margin-bottom:20px;">
+        그대로 멈춰 거기 Stop!
+      </div>
+      <div style="height:1px;background:rgba(200,200,200,.15);margin-bottom:0;"></div>
+    </div>
 
-      <!-- 主歌詞 -->
-      <div style="
-        font-size:40px;font-weight:900;letter-spacing:-.01em;line-height:1.25;
-        color:#c8c8c8;
-        text-shadow:0 0 40px rgba(200,200,200,.15);
-        margin-bottom:32px;
-        font-family:'Noto Sans TC','PingFang TC',sans-serif;
-      ">그대로 멈춰 거기 Stop!</div>
+    <!-- 可滾動內容區 -->
+    <div style="position:relative;z-index:1;padding:24px 44px 40px;overflow-y:auto;flex:1;
+      font-family:'Noto Sans TC','PingFang TC',sans-serif;color:#aaa;font-size:13px;line-height:1.9;">
+
+      <!-- 問題 -->
+      <div style="font-size:11px;color:#555;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px;">問題</div>
+      <p style="color:#c8c8c8;margin-bottom:8px;">台灣救生員產業正面臨系統性失靈。持照人數約 1 萬人，但場館普遍缺工——原因不是證照太難考，而是有證照的人不願意入行，或進來了很快就離開。</p>
+      <p style="margin-bottom:24px;">監察院 2024 年調查報告指出，主因是工作機會不穩定與薪資未成長。</p>
 
       <!-- 分隔 -->
-      <div style="width:36px;height:1px;background:rgba(200,200,200,.3);margin:0 auto 28px;"></div>
+      <div style="height:1px;background:rgba(200,200,200,.1);margin-bottom:24px;"></div>
 
-      <!-- 口號 -->
-      <div style="
-        font-size:13px;letter-spacing:.12em;color:#888;
-        font-family:'Noto Sans TC','PingFang TC',sans-serif;
-        line-height:1.8;
-      ">
-        停止忍受救生員的低劣就業環境！<br>
-        <span style="font-size:11px;opacity:.6;letter-spacing:.06em;">Built by 中和雞鴨扣σ`∀´)σ</span>
-      </div>
+      <!-- 研究發現 -->
+      <div style="font-size:11px;color:#555;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px;">第一線的聲音</div>
+      <p style="margin-bottom:14px;">2026 年 5 月，本研究訪談 8 名救生員、回收 15 份問卷，共 23 位第一線從業者。</p>
+
+      <!-- 表格 -->
+      <table style="width:100%;border-collapse:collapse;margin-bottom:16px;font-size:12px;">
+        <tr style="border-bottom:1px solid rgba(255,255,255,.1);">
+          <td style="padding:8px 0;color:#888;">議題</td>
+          <td style="padding:8px 0;color:#888;text-align:right;">共識比例</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.06);">
+          <td style="padding:8px 0;color:#c8c8c8;">薪資與責任嚴重失衡</td>
+          <td style="padding:8px 0;color:#c8c8c8;text-align:right;">91.3%</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.06);">
+          <td style="padding:8px 0;color:#c8c8c8;">被迫負擔大量非本職勞務</td>
+          <td style="padding:8px 0;color:#c8c8c8;text-align:right;">91.3%</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.06);">
+          <td style="padding:8px 0;color:#c8c8c8;">法律究責風險造成心理壓力</td>
+          <td style="padding:8px 0;color:#c8c8c8;text-align:right;">65.2%</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;color:#c8c8c8;">執法不足、非法雇用普遍</td>
+          <td style="padding:8px 0;color:#c8c8c8;text-align:right;">34.8%</td>
+        </tr>
+      </table>
+
+      <p style="margin-bottom:24px;">月薪中位數僅 36,500 元，僅為最低工資的 1.24 倍，卻須同時負責清潔、機房加氯、設備維修，甚至有人被要求徒手爬上四樓鷹架刷漆。</p>
+
+      <!-- 分隔 -->
+      <div style="height:1px;background:rgba(200,200,200,.1);margin-bottom:24px;"></div>
+
+      <!-- 四大防線 -->
+      <div style="font-size:11px;color:#555;letter-spacing:.15em;text-transform:uppercase;margin-bottom:16px;">四大防線</div>
+
+      <div style="margin-bottom:14px;">一、資訊透明　救生員避雷地圖，讓劣質場館無處遁形</div>
+      <div style="margin-bottom:14px;">二、吹哨套利　推動檢舉獎金制度，讓市場自行淘汰黑牌</div>
+      <div style="margin-bottom:14px;">三、法律防禦　推廣文字存證 SOP，將責任精準反彈給下指令的管理層</div>
+      <div style="margin-bottom:24px;">四、保險制裁　建請金管會將「現場未持有合格救生員證」列為公共意外責任險除外事由</div>
+
+      <!-- 分隔 -->
+      <div style="height:1px;background:rgba(200,200,200,.1);margin-bottom:24px;"></div>
+
+      <!-- 已採取的行動 -->
+      <div style="font-size:11px;color:#555;letter-spacing:.15em;text-transform:uppercase;margin-bottom:14px;">已採取的行動</div>
+      <div style="margin-bottom:8px;">1. 致函運動部、金管會、立法委員</div>
+      <div style="margin-bottom:8px;">2. 金管會來電，問題已轉交產險公會處理</div>
+      <div style="margin-bottom:24px;">3. 建立「救生員避雷地圖」作為資訊透明工具</div>
     </div>
   </div>
 </div>
